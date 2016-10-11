@@ -1,0 +1,40 @@
+.theme1{
+   background-image:url(images/theme1.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme2{
+   background-image:url(images/theme2.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme3{
+   background-image:url(images/theme3.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme4{
+   background-image:url(images/theme4.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme5{
+   background-image:url(images/theme5.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme6{
+   background-image:url(images/theme6.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme7{
+   background-image:url(images/theme7.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}
+.theme8{
+   background-image:url(../themes/theme8.jpg);
+   background-repeat:no-repeat;
+   background-size:cover;
+}

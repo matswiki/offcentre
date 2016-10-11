@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<title>JSObjectStyles</title>
+</head>
+<body>
+<script>
+  /*
+    Style 1
+  */
+  Style1Class = function () {
+    return {
+      method1: function (param1){
+        this.log("method1.param1 = " + param1);
+      },
+      
+      method2: function (param2){
+        this.log("method2.param2 = " + param2);
+      },
+      
+      log: function (message){
+        document.getElementById("logger").innerHTML = message;
+      }
+    }
+  }
+  
+  
+  /*
+   Style 2
+  */ 
+  package1 = {
+    Class1: function () {
+        return {
+          method1 : function (param1){
+            this.log("method1.param1 = " + param1);
+          },
+          log: function (message){
+            document.getElementById("logger").innerHTML = message;
+          }
+        }
+    },
+    
+    Class2: function (price) {
+        this.price = price;
+        this.getPrice = function(){
+                          return this.price;
+                        };        
+    }
+  }
+
+  /*
+   Style 3
+  */ 
+  za = {
+    com: {
+      Class1: function () {
+          return {
+            method1 : function (param1){
+              this.log("method1.param1 = " + param1);
+            },
+            log: function (message){
+              document.getElementById("logger").innerHTML = message;
+            }
+          }
+      },
+      
+      Product: function (itemName, price) {
+          this.price = price;
+          this.itemName = itemName;
+          this.getPrice = function(){
+            return this.price;
+          };        
+          this.getName = function (){
+            return this.itemName;
+          }
+      }
+    }
+  }
+  
+  var Logger = {
+        log: function(message){
+          document.getElementById("logger").innerHTML += "<br/>" + message;
+        }
+      }
+      
+  var Dialog = function(){
+    this.log = function(message){ 
+      Logger.log(message);
+    };
+    this.anotherMethod = function(){
+      Logger.log("another method in Dialog");
+    }
+  };
+</script>
+
+<div id="logger"></div>
+
+<script>
+  /*
+  var style1Object = new Style1Class();
+  style1Object.method2("hello");
+  */
+
+  /*
+  var style2Object = new package1.Class1();
+  style2Object.method1("my name is...");
+  */
+
+  
+  var style2Object = new package1.Class2(300);
+  Logger.log("the price is " + style2Object.getPrice());
+  
+  var product = new za.com.Product("Bread",400);
+  Logger.log("The price of "+product.getName() +" is R" + product.getPrice());
+  new Dialog().anotherMethod();
+  
+</script>
+</body>

@@ -1,0 +1,447 @@
+<!doctype html>
+<html>
+<head>
+<title>Entity</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../../lib/beautify/vkbeautify.0.99.00.beta.js"></script>
+<script src="../../lib/sqlformatter/SQLFormatter.js"></script>
+<script src="../../lib/sorttable/sorttable.js"></script>
+<script src="../../lib/main.js"></script>
+<link type="text/css" rel="stylesheet" href="../../lib/bootstrap/bootstrap.max.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/style.css"/>
+</head>
+<body bgcolor="#ffffff">
+  <div class="menuBar">
+    <div class="menuItem" style="text-align:center; left:500px; width:auto;">
+      <input type="button" class="glass btn blue" value="Save table as" onclick="saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
+      <input type="text" id="recordName" value=""/>
+    </div>
+    <div class="menuItem" style="text-align:center; left:5px; width:auto;">
+      Open table:&nbsp;
+      <select id="messageDefinitionList" onchange="retrieveMessageDefinition()">
+      </select>&nbsp;&nbsp;&nbsp;
+      <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
+    </div>
+  </div>
+ 
+  <div class="toolbar">
+    <img src="../../images/sqlImport.png"   class="toolbarIcon" onclick="showDialog('tcImportDialog')" title="Import table from SQL script"/>&nbsp;
+    <img src="../../images/java.png"  class="toolbarIcon" onclick="showDialog('codeDiv')" title="Java"/>&nbsp;
+    <img src="../../images/xsd.png"   class="toolbarIcon" onclick="showDialog('xsdDiv')" title="XSD Viewer"/>&nbsp;
+    <img src="../../images/json.png"  class="toolbarIcon" onclick="showDialog('jsonImportDiv')" title="JSON editor"/>&nbsp;
+    <img src="../../images/sql.png"   class="toolbarIcon" onclick="showDialog('sqlViewerDialog')" title="SQL Viewer"/>&nbsp;
+    <img src="../../images/log.png"   class="toolbarIcon" onclick="showDialog('loggerDiv')" title="Log"/>&nbsp;
+  </div>
+ 
+  <div id="messageDefinition" class="contentPane whiteBar" style="display:block;">
+    <div class="dialogHeader whiteBar">
+      <div class="dialogHeaderTitle" onclick="openItemList(0)">Table definition</div>
+      <div class="dialogHeaderCloser">
+        <input type="button" class="glass btn green" onclick="showDialog('newFieldDialog')" value="Add Field"/>
+      </div>
+    </div>
+    <div class="dialogContent whiteBar">
+      <section class="fixedHeaderTable blueGradient" style="height:100%; width:100%;">
+        <div class="container shadow">
+          <table id="messageDefinitionTable">
+            <thead>
+              <tr>
+                <th><div>Field name</div></th>
+                <th><div>Type</div></th>
+                <th><div>Java type</div></th>
+                <th><div>Size</div></th>
+                <th><div>Nullable</div></th>
+                <th><div>&nbsp;</div></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </section>       
+    </div>
+  </div>
+ 
+  <div id="xsdDiv" class="dialogDivOverlay">
+    <div id="xsdDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/xsd.png" class="dialogIcon"/>
+        <span class="dialogHeaderTitle">XSD Viewer</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
+          <div>Options</div><br/>
+          <div class="menuLink" onclick="minifyXsdTypes()">Minify</div>
+          <div class="menuLink" onclick="generateXsdTypes(false)">Format</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('xsdDiv')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <pre id="xsdTypes"></pre>
+      </div>
+    </div>
+  </div> 
+ 
+  <div id="loggerDiv" class="dialogDivOverlay">
+    <div id="loggerDivDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/log.png" class="dialogIcon"/>
+        <span class="dialogHeaderTitle">Log</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
+          <div>Options</div><br/>
+          <div class="menuLink" onclick="clearLog()">Clear</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('loggerDiv')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <table id="loggerTable" style="width:100%"></table>
+      </div>
+    </div>
+  </div>  
+ 
+ 
+  <div id="codeDiv" class="dialogDivOverlay">
+    <div id="codeDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/java.png" class="dialogIcon"/>
+        <span class="dialogHeaderTitle">Java</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
+          <div>Options</div><br/>
+          <div class="menuLink" onclick="generateJavaAdaptor()">Adaptor</div>
+          <div class="menuLink" onclick="generateJavaAdaptorToXsd()">Adaptor to XSD</div>
+          <div class="menuLink" onclick="generateJavaXsdToAdaptor()">XSD to Adaptor</div>
+          <div class="menuLink" onclick="showCodeMerge()">Code Merge</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('codeDiv')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <pre id="generatedCode"></pre>
+      </div>
+    </div>
+  </div> 
+
+  <div id="codeMergeDiv" class="dialogDivOverlay">
+    <div id="codeMergeDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/java.png" class="dialogIcon"/>
+        <span class="dialogHeaderTitle">Code Merge</span>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('codeMergeDiv')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <table style="width:100%;">
+          <thead>
+          <tr> 
+            <td style="width:30%">List<br/>
+              <select multiple id="codeMergeList" size="15" style="width:100%"></select>
+            </td>
+            <td style="width:30%">Template<br/>
+              <textarea id="codeMergeTemplate"></textarea>
+            </td>
+            <td style="width:40%">Merge Result<br/>
+              <textarea id="codeMergeResult"></textarea>
+            </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="dialogFooter center">
+        <input type="button" class="glass btn green" value="Merge" onclick="mergeCode()"/>&nbsp;
+      </div>
+    </div>
+  </div> 
+  
+   <div id="jsonImportDiv" class="dialogDivOverlay">
+    <div id="jsonImportDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/json.png" class="dialogIcon"/>
+        <span class="dialogHeaderTitle">JSON editor</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
+          <div>Options</div><br/>
+          <div class="menuLink" onclick="importJSON()">Import</div>
+          <div class="menuLink" onclick="minifyJSONRecordCode()">Minify</div>
+          <div class="menuLink" onclick="generateJSONRecordCode()">Format</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('jsonImportDiv')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <textarea id="jsonImporter"></textarea>
+      </div>
+    </div>
+  </div> 
+ 
+ <div id="newFieldDialog" class="dialogDivOverlay">
+   <div class="dialogDiv" id="newFieldDiv" style="width:400px; height:400px; top:100px; left:200px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/table.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle">Add new Field</div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('newFieldDialog')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <table style="width:100%">
+        <thead>
+          <tr>
+            <td>name</td>
+            <td><input type="text" style="width:300px;" id="fieldName"/></td>
+          </tr>
+          <tr>
+            <td>type</td>
+            <td>
+              <select id="fieldType" style="width:300px;">
+                <option value="CHARACTER">CHARACTER</option>
+                <option value="VARCHAR">VARCHAR</option>
+                <option value="TEXT">TEXT</option>
+                <option value="LONGVARCHAR">LONGVARCHAR</option>
+                <option value="NUMERIC">NUMERIC</option>
+                <option value="DECIMAL">DECIMAL</option>
+                <option value="BIGINT">BIGINT</option>
+                <option value="BIT">BIT</option>
+                <option value="TINYINT">TINYINT</option>
+                <option value="SMALLINT">SMALLINT</option>
+                <option value="INTEGER">INTEGER</option>
+                <option value="BIGINT">BIGINT</option>
+                <option value="REAL">REAL</option>
+                <option value="FLOAT">FLOAT</option>
+                <option value="DOUBLEPRECISION">DOUBLEPRECISION</option>
+                <option value="BINARY">BINARY</option>
+                <option value="VARBINARY">VARBINARY</option>
+                <option value="LONGVARBINARY">LONGVARBINARY</option>
+                <option value="DATETIME">DATETIME</option>
+                <option value="DATE">DATE</option>
+                <option value="TIME">TIME</option>
+                <option value="TIMESTAMP">TIMESTAMP</option>
+                <option value="UNIQUEIDENTIFIER">UNIQUEIDENTIFIER</option>
+                <option value="IMAGE">IMAGE</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>size</td>
+            <td>
+              <input type="text" id="fieldSize" style="width:100px;"/>
+            </td>
+          </tr>
+          <tr>
+            <td>nullable</td>
+            <td style="width:200px;">
+              <select id="nullableList" style="width:300px">
+                <option value="NOT NULL">NOT NULL</option>
+                <option value="NULL">NULL</option>
+              </select>
+            </td>          
+          </tr>
+        </thead>
+        </table>
+      </div>
+      <div class="dialogFooter center">
+        <input type="button" class="glass btn green" value="Save" onclick="addRow()"/>&nbsp;
+      </div>
+   </div>
+ </div>
+ 
+ <div id="fieldEditorDialog" class="dialogDivOverlay">
+   <div class="dialogDiv" id="fieldEditorDiv" style="width:400px; height:350px; top:100px; left:200px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/table.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle">Field Editor</div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('fieldEditorDialog')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <table style="width:100%">
+        <thead>
+        <tr>
+          <td>name</td>
+          <td><input type="text" id="editor_fieldName" value="" style="width:98%"/></td>
+        </tr>
+        <tr>
+          <td>type</td>
+          <td>
+            <select id="editor_fieldType"  style="width:98%">
+              <option value="CHARACTER">CHARACTER</option>
+              <option value="VARCHAR">VARCHAR</option>
+              <option value="LONGVARCHAR">LONGVARCHAR</option>
+              <option value="NUMERIC">NUMERIC</option>
+              <option value="DECIMAL">DECIMAL</option>
+              <option value="BIT">BIT</option>
+              <option value="BIGINT">BIGINT</option>
+              <option value="TINYINT">TINYINT</option>
+              <option value="SMALLINT">SMALLINT</option>
+              <option value="INTEGER">INTEGER</option>
+              <option value="BIGINT">BIGINT</option>
+              <option value="REAL">REAL</option>
+              <option value="FLOAT">FLOAT</option>
+              <option value="DOUBLEPRECISION">DOUBLEPRECISION</option>
+              <option value="BINARY">BINARY</option>
+              <option value="VARBINARY">VARBINARY</option>
+              <option value="LONGVARBINARY">LONGVARBINARY</option>
+              <option value="DATETIME">DATETIME</option>
+              <option value="DATE">DATE</option>
+              <option value="TIME">TIME</option>
+              <option value="TIMESTAMP">TIMESTAMP</option>
+              <option value="UNIQUEIDENTIFIER">UNIQUEIDENTIFIER</option>
+              <option value="IMAGE">IMAGE</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>size</td>
+          <td><input type="text" id="editor_fieldSize" value=""/></td>
+        </tr>
+        <tr>
+          <td>nullable</td>
+          <td>
+            <select id="editor_nullable"  style="width:98%">
+              <option value="NOT NULL">NOT NULL</option>
+              <option value="NULL">NULL</option>
+            </select>
+          </td>
+        </tr>
+        </thead>
+        </table>
+      </div>
+      <div class="dialogFooter center">
+        <input type="button" class="glass btn green" value="Save" onclick="saveFieldEditor()"/>&nbsp;
+      </div>
+   </div>
+  </div>
+ 
+  <div id="tcImportDialog" class="dialogDivOverlay">
+    <div id="importSQLDiv" class="dialogDiv" style="width:80%; height:80%; top:60px; left:20px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img class="dialogIcon" src="images/sqlImport.png"/>
+        <span class="dialogHeaderTitle">SQL Table Importer</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
+          <div>Options</div><br/>
+          <div class="menuLink" class="btn blue" onclick="importTCText()"/>Import</div>
+          <div class="menuLink" class="btn blue"onclick="formatImportTCText()">Format</div>
+          <div class="menuLink" class="btn blue" onclick="clearImportTCText()">Clear</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('tcImportDialog')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <textarea id="tcImportText" placeholder="example: create table test() (col1 varchar not null)"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div id="sqlViewerDialog" class="dialogDivOverlay">
+    <div id="sqlViewerDialogDiv" class="dialogDiv" style="width:90%; height:90%; top:20px; left:10px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img class="dialogIcon" src="../../images/sql.png"/>
+        <span class="dialogHeaderTitle">SQL Viewer</span>
+        <div class="dropDownMenuItem" style="right:100px; z-index:30; width:200px;">
+          <div>SQL Scripts</div><br/>
+          <div style="text-align:left;">
+             TABLE scripts
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateTCsql)">Create table</li>
+              <li class="menuLink" onclick="loadSQL(generateUpdateTableSql)">Update table</li>
+             </ul>
+             CREATE script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPCreateSql)">Create</li>
+              <li class="menuLink" onclick="loadUsage('create')">Usage</li>
+             </ul>
+             RETRIEVE script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPCreateSql)">Retrieve</li>
+              <li class="menuLink" onclick="loadUsage('retrieve')">Usage</li>
+             </ul>
+             SEARCH script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPSearchSql)">Search</li>
+              <li class="menuLink" onclick="loadUsage('search')">Usage</li>
+             </ul>
+             LIST script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPListSql)">List</li>
+              <li class="menuLink" onclick="loadUsage('list')">Usage</li>
+             </ul>
+             UPDATE script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPUpdateSql)">Update</li>
+              <li class="menuLink" onclick="loadUsage('update')">Usage</li>
+             </ul>
+             DELETE script
+             <ul>
+              <li class="menuLink" onclick="loadSQL(generateSPDeleteSql)">Delete</li>
+              <li class="menuLink" onclick="loadUsage('delete')">Usage</li>
+             </ul>
+           </div>
+        </div>        
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('sqlViewerDialog')"/>
+        </div>
+      </div>
+      <div class="dialogContent">
+        <pre id="sqlViewerText"></pre>
+      </div>
+    </div>
+  </div>
+  
+  <div id="infoDialog" class="dialogDivOverlay">
+    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:100px; left:200px;">
+      <div class="dialogHeader greenBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/thumbsup.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle"></div>
+        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('infoDialog')"/></div>
+      </div>
+      <div class="dialogContent center">
+        <br/>
+        Your request has been completed successfully.
+        <br/>
+      </div>
+    </div>
+  </div> 
+
+  <div id="areYouSureDialog" class="dialogDivOverlay">
+    <div id="areYouSureDialogDiv" class="dialogDiv" style="width:40%; height:200px; top:100px; left:500px;">
+      <div class="dialogHeader redBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/question.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle">Warning</div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('areYouSureDialog')"/>
+        </div>
+      </div>
+      <div class="dialogContent center">
+        <br/>
+        <span id="areYouSureMessage">Do you want to delete selected record?</span>
+        <br/><br/>
+        <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>&nbsp;
+        <br/>
+      </div>
+    </div>
+  </div> 
+
+  <div id="listDialog" class="dialogDivOverlay">
+    <div id="listDialogDiv" class="dialogDiv" style="width:40%; height:80%; top:10px; left:400px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/table.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle" id="listDialogTitle">Quick List</div>
+        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('listDialog')"/></div>
+      </div>
+      <div class="dialogContent">
+        <textarea id="listDialogItems"></textarea>
+      </div>
+    </div>
+  </div> 
+  
+  
+  <script>
+    loadFromLocalStorage("messageDefinitionList");
+  </script>
+ </body>
+</html>

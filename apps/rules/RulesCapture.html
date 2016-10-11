@@ -1,0 +1,761 @@
+<!doctype html>
+<html>
+<head>
+<title>Rules</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../../lib/beautify/vkbeautify.0.99.00.beta.js"></script>
+<script src="../../lib/sqlformatter/SQLFormatter.js"></script>
+<script src="../../lib/main.js"></script>
+<link type="text/css" rel="stylesheet" href="../../lib/bootstrap/bootstrap.max.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/style.css"/>
+
+<script>
+
+  var entityName="";
+  var entityFilter = "Person";
+  var currentRow;
+  
+  var operatorLookupTable = [
+    {key:"equals",value:"="},
+    {key:"not equal",value:"<>"},
+    {key:"greater than",value:">"},
+    {key:"greater than or equal",value:">="},
+    {key:"less than",value:"<"},
+    {key:"less than or equal",value:"<="},
+  ];
+  var actionLookupTable = [
+    {key:"hold",value:"hold"},
+    {key:"calculate fee",value:"calculateFee"},
+    {key:"flag AML",value:"flagAML"},
+  ];
+  var propertyTypeLookupTable = [
+    {key:"CHARACTER",value:"CHARACTER"},
+    {key:"VARCHAR",value:"VARCHAR"},
+    {key:"TEXT",value:"TEXT"},
+    {key:"LONGVARCHAR",value:"LONGVARCHAR"},
+    {key:"NUMERIC",value:"NUMERIC"},
+    {key:"DECIMAL",value:"DECIMAL"},
+    {key:"BIGINT",value:"BIGINT"},
+    {key:"BIT",value:"BIT"},
+    {key:"TINYINT",value:"TINYINT"},
+    {key:"SMALLINT",value:"SMALLINT"},
+    {key:"INTEGER",value:"INTEGER"},
+    {key:"BIGINT",value:"BIGINT"},
+    {key:"REAL",value:"REAL"},
+    {key:"FLOAT",value:"FLOAT"},
+    {key:"DOUBLEPRECISION",value:"DOUBLEPRECISION"},
+    {key:"BINARY",value:"BINARY"},
+    {key:"VARBINARY",value:"VARBINARY"},
+    {key:"LONGVARBINARY",value:"LONGVARBINARY"},
+    {key:"DATETIME",value:"DATETIME"},
+    {key:"DATE",value:"DATE"},
+    {key:"TIME",value:"TIME"},
+    {key:"TIMESTAMP",value:"TIMESTAMP"},
+    {key:"UNIQUEIDENTIFIER",value:"UNIQUEIDENTIFIER"},
+    {key:"IMAGE",value:"IMAGE"}
+  ];
+  
+  function showDropdown(element) {
+    var event = new MouseEvent("mousedown");
+    element.dispatchEvent(event);
+  }
+  
+  function loadListFromStorage(listName, filter, replace, exclude){
+    var storage = getStorage();
+    if (storage) {
+      var messageDefinitionList = document.getElementById(listName);
+      for(var i=messageDefinitionList.options.length-1;i>=0;i--)
+      {
+        messageDefinitionList.remove(i);
+      }
+      var firstOne = 0;
+      for(var key in storage) {
+        var option = document.createElement("option");
+        option.text = key;
+        option.value = key;
+        if (filter && filter.length > 0){
+            if (key.indexOf(filter) == 0){
+              if (replace && replace.toUpperCase() == "TRUE"){
+                option.text = option.text.replace(filter,"");
+              } 
+              if (exclude && key.indexOf(exclude) < 0){
+                if (firstOne ==0){
+                  var emptyOption = document.createElement("option");
+                  emptyOption.text = "";
+                  emptyOption.value = "";
+                  messageDefinitionList.add(emptyOption);
+                }
+                firstOne++;
+                messageDefinitionList.add(option);
+              }
+            }
+        } else {
+          if (exclude && key.indexOf(exclude) < 0){
+            if (firstOne ==0){
+              var emptyOption = document.createElement("option");
+              emptyOption.text = "";
+              emptyOption.value = "";
+              messageDefinitionList.add(emptyOption);
+            }
+            firstOne++;
+            messageDefinitionList.add(option);
+          }
+        }
+      }
+    }
+  }
+
+  function clearAllListsAndTables(){
+    clearTable("conditionsTable");
+    clearTable("actionsTable");
+    clearSelectList("entityRulesList");
+    clearSelectList("entityPropertyList");
+    document.getElementById("entityRuleName").value = "";
+  }
+  
+  function loadListFromLookupTable(listId, lookupTable){
+    if (listId && lookupTable){
+      clearSelectList(listId);
+      list = document.getElementById(listId);
+      for (var i = 0; i < lookupTable.length; i++){
+        var option = document.createElement("option");
+        option.text = lookupTable[i].key;
+        option.value = lookupTable[i].value;
+        list.add(option);
+      }
+    }
+  }
+  
+  function initialise(){
+    clearAllListsAndTables();
+    clearSelectList("entityList");
+    loadListFromStorage("entityList",entityFilter,"FALSE","_");
+    loadListFromLookupTable("operatorList",operatorLookupTable);
+    loadListFromLookupTable("actionList",actionLookupTable);
+    loadListFromLookupTable("editor_operator",operatorLookupTable);
+  }
+  
+  function isEmpty(elementId){
+    var element = document.getElementById(elementId);
+    return false;
+  }
+  
+  function reloadEntityList(){
+    clearSelectList("entityList");
+    entityFilter = document.getElementById("entityFilterText").value;
+    loadListFromStorage("entityList",entityFilter,"FALSE","_");
+  }
+  
+  function clearTable(tableId){
+    document.getElementById(tableId).innerHTML = "";
+  }
+  
+  function clearSelectList(selectId){
+    var select = document.getElementById(selectId);
+    while (select.firstChild) {
+      select.removeChild(select.firstChild);
+    }
+  }
+
+  function getCurrentOption(listId){
+    var option = document.getElementById(listId).options[document.getElementById(listId).selectedIndex];
+    return option;
+  }
+  
+  function retrieveEntity(){
+    var storage = getStorage();
+    clearAllListsAndTables();
+    if (storage){
+      var entityList = document.getElementById("entityList");
+      var selectedItem = entityList.options[entityList.selectedIndex].value;
+      entityName = capitalizeFirstLetter(selectedItem);
+      var output = storage.getItem(entityName);
+      
+      var key = entityName+"_";
+      loadListFromStorage("entityRulesList",key,"TRUE"," ");
+      
+      var entityPropertyList = document.getElementById("entityPropertyList");
+      
+      try{
+        var jsonVar = JSON.parse(output);
+        if (jsonVar){
+          var rowCount = jsonVar.length;
+          for (var rowIndex = 0; rowIndex < rowCount; rowIndex++){
+            addEntityPropertyToList(jsonVar[rowIndex].name+":"+jsonVar[rowIndex].type+":"+jsonVar[rowIndex].size,entityPropertyList);
+          }
+          multipleColumnSelect("entityPropertyList");
+        }
+        document.getElementById("titleEntityName").innerHTML = entityName;
+        document.getElementById("conditionEntityName").innerHTML = entityName;
+      } catch (exception){
+        showDialog("errorDialog","Failed to retrieve entity (" + exception +")");
+      }
+    } 
+  }
+  
+  function addEntityPropertyToList(fieldName, propertyList){
+    var opt = document.createElement("option");
+    opt.value= fieldName;
+    opt.innerHTML = fieldName; 
+    propertyList.appendChild(opt);
+  }
+  
+  function addConditionRow(property, operator, propertyValue){
+    var conditionsTable = document.getElementById("conditionsTable").getElementsByTagName("tbody")[0];
+    if (!conditionsTable){
+      document.getElementById("conditionsTable").appendChild(document.createElement("tbody"))
+      conditionsTable = document.getElementById("conditionsTable").getElementsByTagName("tbody")[0];
+    }
+    if (conditionsTable){
+      var row = conditionsTable.insertRow(-1);
+      row.insertCell(0).innerHTML = property;
+      row.insertCell(1).innerHTML = operator;
+      row.insertCell(2).innerHTML = propertyValue;
+      var output = "&nbsp;&nbsp;<input type=\"button\" class=\"glass btn green\" value=\"edit\" onclick=\"editCondition(this)\" title=\"edit\"/>"; 
+      output += "&nbsp;&nbsp;<input type=\"button\" class=\"glass btn red\"   value=\"del\"  onclick=\"deleteRow(this)\" title=\"delete\"/>"; 
+      row.insertCell(3).innerHTML = output;
+    }
+  }
+
+  function addCondition(){
+    try  {
+      var property = document.getElementById("entityPropertyList").options[document.getElementById("entityPropertyList").selectedIndex].value;
+      var operator = document.getElementById("operatorList").options[document.getElementById("operatorList").selectedIndex].value;
+      var propertyValue = document.getElementById("propertyValue").value;
+      if (propertyValue && propertyValue.length > 0){
+        addConditionRow(property, operator, propertyValue);
+      } else {
+        focusOn("propertyValue");
+        showDialog("errorDialog","Please supply the property value.");
+      }
+    } catch (exception){
+      focusOn("entityList");
+      showDialog("errorDialog","Please select entity.");
+    }
+  }
+  
+  function addActionRow(actionValue){
+    var actionsTable = document.getElementById("actionsTable");
+    var row = actionsTable.insertRow(-1);
+    row.insertCell(0).innerHTML = actionValue;
+    var output = "&nbsp;&nbsp;<input type=\"button\" class=\"glass btn red\" value=\"del\" onclick=\"deleteRow(this)\" title=\"delete\"/>"; 
+    row.insertCell(1).innerHTML = output;
+  }
+  
+  function addAction(){
+    if (entityName && entityName.length > 0){
+      var actionValue = document.getElementById("actionList").options[document.getElementById("actionList").selectedIndex].value;
+      addActionRow(actionValue);
+    } else {
+      focusOn("entityList");
+      showDialog("errorDialog","Please select entity.");
+    }
+  }
+  
+  function getJsonRuleObject(ruleJsonText){
+    return JSON.parse(ruleJsonText);
+  }
+  
+  function populateRuleUI(ruleJsonText){
+    clearTable("conditionsTable");
+    clearTable("actionsTable");
+    document.getElementById("entityRuleName").value = "";
+    if (ruleJsonText && ruleJsonText.length>0){
+      document.getElementById("entityRuleName").value = getCurrentOption("entityRulesList").text;
+      var ruleJsonObject = getJsonRuleObject(ruleJsonText);
+      if (ruleJsonObject){
+        var conditions = ruleJsonObject.conditions;
+        if (conditions && conditions.length > 0){
+          for (var i = 0; i < conditions.length; i++){
+            addConditionRow(conditions[i].property, conditions[i].operator, conditions[i].propertyValue);
+          }
+        }
+        var actions = ruleJsonObject.actions;
+        if (actions && actions.length > 0){
+          for (var i = 0; i < actions.length; i++){
+            addActionRow(actions[i].action);
+          }
+        }
+      }
+    }
+  }
+
+  function retrieveRule(){
+    var ruleName = getCurrentOption("entityRulesList").value;
+    var storage = getStorage();
+    if (storage){
+      var output = storage.getItem(ruleName);
+      populateRuleUI(output);
+    }
+  }
+  
+  function getEntityRuleConditions(){
+    var output = "";
+    var conditionsTable = document.getElementById("conditionsTable");
+    
+    var rows = conditionsTable.rows;
+    if (rows && rows.length > 0){
+      output += "\"conditions\":[";
+      for (var i = 0; i < rows.length; i++){
+        if (i>0){
+          output += ",";
+        }
+        var cells = rows[i].cells;
+        output += "{\"property\":\""+cells[0].innerHTML+"\",";
+        output += "\"operator\":\""+cells[1].innerHTML+"\",";
+        output += "\"propertyValue\":\""+cells[2].innerHTML+"\"}";
+      }
+      output += "]";
+    } else {
+      output += "\"conditions\":[]";
+    }
+    return output;
+  }
+  
+  function getEntityRuleActions(){
+    var output = "";
+    var actionsTable = document.getElementById("actionsTable");
+    var rows = actionsTable.rows;
+    if (rows && rows.length > 0){
+      output += "\"actions\":[";
+      for (var i = 0; i < rows.length; i++){
+        if (i>0){
+          output += ",";
+        }
+        var cells = rows[i].cells;
+        output += "{\"action\":\""+cells[0].innerHTML+"\"}";
+      }
+      output += "]";
+    } else {
+      output += "\"actions\":[]";
+    }
+    return output;
+  }
+  
+  function getRuleJsonText(){
+    var ruleName = document.getElementById("entityRuleName").value;
+    var entityRuleConditions = getEntityRuleConditions();
+    var entityRuleActions = getEntityRuleActions();
+    var output = "{";
+    output += "\"entity\":\""+entityName+"\",";
+    output += "\"rule\":\""+ruleName+"\",";
+    output += entityRuleConditions+","+entityRuleActions;
+    output += ",\"status\":\"1\"";
+    output += "}";
+    return output
+  }
+  
+  function saveEntityRule(entityRuleNameId){
+    var entityRuleName = document.getElementById(entityRuleNameId).value;
+    var output = "";
+    if (entityName.length > 0){
+      if (entityRuleName && entityRuleName.length > 0){
+        var ruleJsonText = getRuleJsonText();
+        var savedRule = entityName+"_"+entityRuleName;
+        var storage = getStorage();
+        if (storage) {
+          storage.setItem(savedRule,ruleJsonText);
+          document.getElementById(entityRuleNameId).value = "";
+          clearSelectList("entityRulesList");
+          var key = entityName+"_";
+          loadListFromStorage("entityRulesList",key,"TRUE"," ");
+          output = "rule "+entityRuleName+" saved successfully for entity " +entityName+"." ;
+          showDialog("infoDialog",output);
+        } else {
+          output = "I cannot store anything on your system.";
+          showDialog("errorDialog",output);
+        }
+      } else {
+        focusOn(entityRuleNameId)
+        output = "Please supply rule name.";
+        showDialog("errorDialog",output);
+      }
+    } else {
+      focusOn("entityList");
+      output = "Please select entity.";
+      showDialog("errorDialog",output);
+    }
+  }
+  
+  function showRuleJson(){
+    document.getElementById("jsonTextArea").value = getRuleJsonText();
+    formatJSON("jsonTextArea");
+    document.getElementById("jsonDialogTitle").innerHTML = "Rule : " + document.getElementById("entityRuleName").value;
+    showDialog("jsonDialog");
+  }
+  
+  function minifyJSON(jsonTextAreaId){
+    var output = document.getElementById(jsonTextAreaId).value;
+    document.getElementById(jsonTextAreaId).value = vkbeautify.jsonmin(output);
+  }
+  
+  function formatJSON(jsonTextAreaId){
+    var output = document.getElementById(jsonTextAreaId).value;
+    document.getElementById(jsonTextAreaId).value = vkbeautify.json(output);
+  }
+  
+  function getEnglishText(){
+    var output ="";
+    var ruleJsonText = getRuleJsonText();
+    var ruleJsonObject = getJsonRuleObject(ruleJsonText);
+    if (ruleJsonObject){
+      var conditions = ruleJsonObject.conditions;
+      output += "If you see ";
+      if (entityName.length > 0){
+        output += entityName;
+      } else {
+        output += "nothing"
+      }
+      if (conditions && conditions.length > 0){
+         output += " whose \n";
+        for (var i = 0; i < conditions.length; i++){
+           if (i > 0){
+            output += " and \n"
+           }
+           output += indent(2)+conditions[i].property.split(":")[0] +" "+htmlDecode(conditions[i].operator)+" " + conditions[i].propertyValue;
+        }
+      }
+      var actions = ruleJsonObject.actions;
+      output += "\nthen ";
+      if (actions && actions.length > 0){
+        output += "do the following actions: \n";
+        for (var i = 0; i < actions.length; i++){
+          if (i > 0){
+            output += " and \n"
+          }
+          output += indent(2)+actions[i].action;
+        }
+      } else {
+        output += "do nothing.";
+      }
+    }
+    return output;
+  }
+  
+  function showEnglishText(){
+    document.getElementById("englishDialogTitle").innerHTML = "The rule, "+ document.getElementById("entityRuleName").value+", states:";
+    document.getElementById("englishTextArea").value = getEnglishText();
+    showDialog("englishDialog");
+  }
+  
+  function showConditionEditor(thisRow){
+    currentRow = thisRow.parentNode.parentNode;
+    if (currentRow){
+      document.getElementById("editor_property").value=currentRow.cells[0].innerHTML.split(":")[0];
+      document.getElementById("editor_propertyType").value=currentRow.cells[0].innerHTML.split(":")[1];
+      if (currentRow.cells[0].innerHTML.split(":")[2]){
+        document.getElementById("editor_propertySize").value=currentRow.cells[0].innerHTML.split(":")[2];
+      } else {
+        document.getElementById("editor_propertySize").value = "null";
+      }
+      document.getElementById("editor_operator").value=htmlDecode(currentRow.cells[1].innerHTML);
+      document.getElementById("editor_propertyValue").value=currentRow.cells[2].innerHTML;
+    }
+    showDialog("conditionEditorDialog");
+  }
+
+  function saveCondition(){
+    if (currentRow){
+      var propertyCol = document.getElementById("editor_property").value;
+      propertyCol += ":" + document.getElementById("editor_propertyType").value;
+      if (document.getElementById("editor_propertySize") && document.getElementById("editor_propertySize").value != "null"){
+        propertyCol += ":" + document.getElementById("editor_propertySize").value;
+      }
+      currentRow.cells[0].innerHTML = propertyCol;
+      currentRow.cells[1].innerHTML = document.getElementById("editor_operator").options[document.getElementById("editor_operator").selectedIndex].value;
+      currentRow.cells[2].innerHTML = document.getElementById("editor_propertyValue").value;
+    }
+    closeDialog("conditionEditorDialog");
+  }
+  
+  function editCondition(thisRow){
+    if (thisRow){
+      currentRow = thisRow;
+      showConditionEditor(thisRow)
+    }
+  }
+
+  function getSqlText(){
+    var output ="";
+    var entityName = getCurrentOption("entityList").text;
+    var ruleName = document.getElementById("entityRuleName").value;
+    var ruleJsonText = getRuleJsonText();
+    var ruleJsonObject = getJsonRuleObject(ruleJsonText);
+    if (ruleJsonObject){
+      output += "BEGIN\n";
+      output += indent(2)+"DECLARE @rulesProfileId NUMERIC(20,0)\n";
+      output += indent(2)+"DECLARE @entityRulesId NUMERIC(20,0)\n";
+      output += indent(2)+"INSERT INTO RulesProfile(rulesProfileCode, statusCode ) VALUES (";
+      output += "'Rules Profile 001','00')\n";
+      output += indent(2)+"SELECT @rulesProfileId = @@IDENTITY\n";
+      output += indent(2)+"INSERT INTO EntityRules (rulesProfileId, entityName,ruleName,statusCode) VALUES (";
+      output += "@rulesProfileId,'"+entityName+"','"+ruleName+"','00')\n";
+      output += indent(2)+"SELECT @entityRulesId = @@IDENTITY\n";
+      var actions = ruleJsonObject.actions;
+      if (actions && actions.length > 0){
+        for (var actionIndex = 0; actionIndex < actions.length; actionIndex++){
+          output += indent(2)+"INSERT INTO RuleActions (entityRulesId,action) VALUES (";
+          output += "@entityRulesId,";
+          output += "'"+actions[actionIndex].action+"')\n";
+        }
+        var conditions = ruleJsonObject.conditions;
+        if (conditions && conditions.length > 0){
+          for (var i = 0; i < conditions.length; i++){
+            output += indent(2)+"INSERT INTO RuleConditions (entityRulesId,property,propertyType,operator,propertyValue)";
+            output += " VALUES (";
+            output += "@entityRulesId,"
+            output += "'"+conditions[i].property.split(":")[0] +"',";
+            output += "'"+conditions[i].property.split(":")[1] +"',";
+            output += "'"+htmlDecode(conditions[i].operator)+"',";
+            output += "'"+conditions[i].propertyValue+"'";
+            output += ")\n";
+          }
+        }
+      }
+      output += "END\nGO\n";
+    }
+    return output;
+  }
+  
+  function showRuleSQL(){
+    document.getElementById("sqlDialogTitle").innerHTML = document.getElementById("entityRuleName").value;
+    var sqlText = getSqlText();
+    if (sqlText && sqlText.length > 0){
+      document.getElementById("sqlTextArea").value = getSqlText();
+      var ruleName = document.getElementById("entityRuleName").value;
+      if (ruleName.length > 0){
+        showDialog("sqlDialog");
+       } else {
+         showDialog("errorDialog","Please supply rule name.");
+       }
+    } else {
+      showDialog("errorDialog","Sorry, there is not enough data to generate SQL.");
+    }
+  }
+  
+  function showFieldListItems(field,listId){
+    field.style.display="none";
+    document.getElementById(listId).style.display="block";
+    showDropdown(document.getElementById(listId));
+  }
+  
+  function updateFieldWithSelectedItem(list,fieldId){
+    document.getElementById(fieldId).value += list.options[list.selectedIndex].value.split(":")[0];
+    document.getElementById(fieldId).style.display="block";
+    list.style.display="none";
+  }
+  
+</script>
+</head>
+<body bgcolor="#E0E0E0" id="body">
+  <div class="menuBar">
+    <div class="menuItem" style="text-align:center; left:5px; width:350px;">
+      Filter:&nbsp;
+      <input type="text" id="entityFilterText"/>&nbsp;
+      <input type="button" class="glass btn" value="Go" onclick="reloadEntityList()"/>
+    </div>
+    <div class="menuItem" style="text-align:center; left:365px; width:auto;">
+      Entity:&nbsp;
+      <select id="entityList" onchange="retrieveEntity()" style="width:200px">
+      </select>&nbsp;&nbsp;&nbsp;
+    </div>
+    <div class="menuItem" style="text-align:center; left:655px; width:auto;">
+      Rule:&nbsp;
+      <select id="entityRulesList" onchange="retrieveRule()" style="width:200px">
+      </select>&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+ 
+  <div class="toolbar">
+    <img src="../../images/english.png"  class="toolbarIcon" onclick="showEnglishText()" title="say what?"/>&nbsp;
+    <img src="../../images/json.png"  class="toolbarIcon" onclick="showRuleJson()" title="JSON view"/>&nbsp;
+    <img src="../../images/sql.png"  class="toolbarIcon" onclick="showRuleSQL()" title="SQL view"/>&nbsp;
+  </div>
+ 
+  <div id="messageDefinition" class="contentPane whiteBar" style="display:block;">
+    <div class="dialogHeader blueBar">
+      <div class="dialogHeaderTitle">Create Rule for <b id="titleEntityName"></b></div>
+      <div class="dialogHeaderCloser">
+        <input type="button" class="glass btn" value="Save Rule as" onclick="saveEntityRule('entityRuleName')"/>&nbsp;
+        <input type="text" id="entityRuleName"/>&nbsp;
+      </div>
+    </div>
+    <div class="dialogContent whiteBar">
+      <table style="width:100%;">
+      <thead>
+        <tr>
+          <th style="width:60%;">
+            
+            <h4>&nbsp;Conditions</h4>
+            &nbsp;&nbsp;
+            When <b id="conditionEntityName"></b> matches
+            <br/>
+            &nbsp;&nbsp;
+            <select id="entityPropertyList" style="width:200px;"></select>&nbsp;
+            <select id="operatorList" style="width:200px;"></select>&nbsp;
+            <input type="text" id="propertyValue"/>&nbsp;
+            <input type="button" class="glass btn" value="Add" onclick="addCondition()"  title="Add simple condition"/>&nbsp;
+          </th>
+          <th style="width:40%">
+            <h4>&nbsp;Actions</h4>
+            &nbsp;&nbsp;
+            Do the following
+            <br/>
+            &nbsp;&nbsp;
+            <select id="actionList" style="width:200px;"></select>&nbsp;
+            <input type="button" class="glass btn" value="Add" onclick="addAction()"/>
+          </th>
+        </tr>
+      <thead>
+      <tr>
+        <td class="top">
+          <table id="conditionsTable">
+          </table>
+        </td>
+        <td class="top">
+          <table id="actionsTable">
+          </table>
+        </td>
+      </tr>
+      </table>
+    </div>
+    <br/><br/><br/>
+ </div>
+   
+ <div id="infoDialog" class="dialogDivOverlay">
+    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:200px; left:40%;">
+      <div class="dialogHeader greenBar">
+        <img src="../../images/thumbsup.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle"></div>
+        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('infoDialog')"/></div>
+      </div>
+      <div class="dialogContent center" id="infoDialogContent"></div>
+    </div>
+ </div> 
+
+ <div id="errorDialog" class="dialogDivOverlay">
+    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:200px; left:40%;">
+      <div class="dialogHeader redBar">
+        <img src="../../images/error.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle"></div>
+        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('errorDialog')"/></div>
+      </div>
+      <div class="dialogContent center" id="errorDialogContent"></div>
+    </div>
+ </div> 
+ 
+ <div id="areYouSureDialog" class="dialogDivOverlay">
+    <div id="areYouSureDialogDiv" class="dialogDiv" style="width:40%; height:200px; top:200px; left:40%;">
+      <div class="dialogHeader redBar">
+        <img src="../../images/question.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle">Warning</div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('areYouSureDialog')"/>
+        </div>
+      </div>
+      <div id="areYouSureDialogContent" class="dialogContent center">
+        <br/>
+        <span id="areYouSureMessage">Do you want to delete selected record?</span>
+        <br/>
+      </div>
+      <div class="dialogFooter center">
+          <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>
+      </div>
+    </div>
+  </div> 
+
+  <div id="jsonDialog" class="dialogDivOverlay">
+    <div id="jsonDialogDiv" class="dialogDiv" style="left:20px; height:600px; top:10px; width:800px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/json.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle" id="jsonDialogTitle"></div>
+        <div class="dropDownMenuItem" style="right:100px;">
+          <div>Options</div><br/>
+          <div class="menuLink" onclick="minifyJSON('jsonTextArea')">Minify</div>
+          <div class="menuLink" onclick="formatJSON('jsonTextArea')">Format</div>
+        </div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('jsonDialog')"/>
+        </div>
+      </div>
+      <div id="jsonDialogContent" class="dialogContent center">
+        <textarea id="jsonTextArea" style="width:100%; height:95%;resize:none;"></textarea>
+      </div>
+    </div>
+  </div> 
+
+  <div id="englishDialog" class="dialogDivOverlay">
+    <div id="englishDialogDiv" class="dialogDiv" style="left:20px; height:500px; top:10px; width:500px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/english.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle" id="englishDialogTitle"></div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('englishDialog')"/>
+        </div>
+      </div>
+      <div id="englishDialogContent" class="dialogContent">
+        <textarea id="englishTextArea" style="width:100%; height:95%;resize:none; padding:10px; font-size:14px;"></textarea>
+      </div>
+    </div>
+  </div> 
+
+  <div id="sqlDialog" class="dialogDivOverlay">
+    <div id="sqlDialogDiv" class="dialogDiv" style="left:50px; height:80%; top:100px; width:80%;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/sql.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle" id="sqlDialogTitle"></div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('sqlDialog')"/>
+        </div>
+      </div>
+      <div id="sqlDialogContent" class="dialogContent">
+        <textarea id="sqlTextArea" style="width:100%; height:95%;resize:none; padding:10px; font-size:14px;"></textarea>
+      </div>
+    </div>
+  </div> 
+  
+  <div id="conditionEditorDialog" class="dialogDivOverlay">
+   <div class="dialogDiv" id="fieldEditorDiv" style="width:60%; height:230px; top:100px; left:300px;">
+      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/table.png" class="dialogIcon"/>
+        <div class="dialogHeaderTitle">Condition Editor</div>
+        <div class="dialogHeaderCloser">
+          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('conditionEditorDialog')"/>
+        </div>
+      </div>
+      <div id="conditionEditorDialogContent" class="dialogContent">
+        <br/>
+        <table style="width:100%">
+        <thead>
+          <tr>
+            <td style="width:40%">
+              property<br/>
+              <input type="text" id="editor_property" value="" style="width:98%"/>
+              <input type="text" id="editor_propertyType" readonly="true" value="" class="hidden"/><br/>
+              <input type="text" id="editor_propertySize" readonly="true" value="" class="hidden"/>
+            </td>
+            <td style="width:30%">
+              operator<br/>
+              <select id="editor_operator"  style="width:98%"></select>
+            </td>
+            <td style="width:30%">
+              value<br/>
+              <input type="text" id="editor_propertyValue" value=""/>
+            </td>
+          </tr>
+        </thead>
+        </table>
+      </div>
+      <div class="dialogFooter center">
+        <input type="button" class="glass btn green" value="Save" onclick="saveCondition()"/>
+      </div>
+   </div>
+  </div>
+  
+  <script>
+    initialise();
+  </script>
+  
+</body>
+</html>
+

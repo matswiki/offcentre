@@ -1,0 +1,117 @@
+.dropdownMenubar{
+  position:absolute;
+  top:0px;
+  height:50px;
+  left:0px;
+  right:0px;
+  padding:19px 5px 0px 5px;
+  background-image: linear-gradient(white,silver);
+  z-index:25;
+  opacity:1.0;
+}
+.dropdown{
+  float:left;
+  font-size:12px;
+  height:30px;
+  border:1px solid silver;
+  overflow:hidden;
+  margin-right:1px;
+  padding:2px 2px 10px 2px;
+  cursor:pointer;
+}
+
+.dropdown:hover{
+  background-color:transparent;
+  width:auto;
+  height:auto;
+  overflow:auto;
+ }
+ .dropdownTitle{
+  padding:5px 10px 10px 10px;
+ }
+.dropdownLink{
+  padding:2px 10px;
+  width:100%;
+  cursor:pointer;
+}
+.dropdownLink:hover{
+  color:#ffffff;
+  background-color:#4682B4;
+}
+.dropdownLink img{
+  width:30px; 
+  height:30px;
+}
+.square{
+  margin-right:0px;
+  border-radius:0px;
+  -webkit-border-radius:0px;
+  -moz-border-radius:0px;
+}
+.rounded{
+  margin-right:0px;
+  border-radius:5px 5px 0px 0px;
+  -webkit-border-radius:5px 5px 0px 0px;
+  -moz-border-radius:5px 5px 0px 0px;
+}
+.tab{
+  margin-right:0px;
+  border-radius:20px 20px 0px 0px;
+  -webkit-border-radius:20px 20px 0px 0px;
+  -moz-border-radius:20px 20px 0px 0px;
+}
+.tabLeft{
+  margin-right:0px;
+  border-radius:20px 0px 0px 0px;
+  -webkit-border-radius:20px 0px 0px 0px;
+  -moz-border-radius:20px 0px 0px 0px;
+}
+.tabRight{
+  margin-right:0px;
+  border-radius:0px 20px 0px 0px;
+  -webkit-border-radius:0px 20px 0px 0px;
+  -moz-border-radius:0px 20px 0px 0px;
+}
+
+.shadow{
+  box-shadow: 2px 2px 5px 0px rgba(228,228,228,0.75);
+  -webkit-box-shadow:2px 2px 5px 0px rgba(228,228,228,0.75);
+  -moz-box-shadow:2px 2px 5px 0px rgba(228,228,228,0.75);
+}
+.shadow:hover{
+  box-shadow: 2px 2px 5px 0px rgba(228,228,228,0.75);
+  -webkit-box-shadow:2px 2px 5px 0px rgba(228,228,228,0.75);
+  -moz-box-shadow:2px 2px 5px 0px rgba(228,228,228,0.75);
+}
+.mainPane{
+  position:fixed;
+  top:45px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  padding:20px;
+  color:#000000;
+  background-color:#ffffff;
+  overflow:hidden;
+  z-index:9;
+}
+.dropdownRed{
+  color:#000000;
+  background-image: linear-gradient(#ff4444,white, white, white, white, white); 
+}
+.dropdownGreen{
+  color:#000000;
+  background-image: linear-gradient(#44ff44,white, white, white, white, white); 
+}
+.dropdownBlue{
+  color:#000000;
+  background-image: linear-gradient(#4444ff,white, white, white, white, white); 
+}
+.dropdownSilver{
+  color:#000000;
+  background-image: linear-gradient(silver,white, white, white, white, white);
+}
+.dropdownBlack{
+  color:#000000;
+  background-image: linear-gradient(black,white, white, white, white, white);
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<title>Fixed Scroller</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+#wrap {
+    overflow: auto;
+    height: 400px;
+}
+th {
+    background-color: silver;
+    border:1px solid silver;
+    width: 200px;
+    height: 30px;
+}  
+td {
+    background-color: white;
+    border:1px solid silver;
+    width: 200px;
+    height: 30px;
+}  
+</style>
+<script>
+  function makeScrollable(divId){
+    document.getElementById(divId).addEventListener("scroll",function(){
+     var translate = "translate(0,"+this.scrollTop+"px)";
+     this.querySelector("thead").style.transform = translate;
+    });  
+  }
+</script>
+
+</head>
+<body>
+<div id="wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Foo</th>
+                <th>Bar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+            <tr><td></td><td></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+  makeScrollable("wrap");
+</script>
+
+</body>
+</html>
