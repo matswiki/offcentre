@@ -1,0 +1,15 @@
+.lightShadow{
+-webkit-box-shadow: 0px 0px 200px 10px rgba(237,242,237,1);
+-moz-box-shadow: 0px 0px 200px 10px rgba(237,242,237,1);
+box-shadow: 0px 0px 200px 10px rgba(237,242,237,1);
+}
+.shadow {
+-webkit-box-shadow: 0px 0px 200px 20px rgba(173,179,173,1);
+-moz-box-shadow: 0px 0px 200px 20px rgba(173,179,173,1);
+box-shadow: 0px 0px 200px 20px rgba(173,179,173,1);
+}
+.darkShadow{
+  -webkit-box-shadow: 0px 0px 200px 10px rgba(124,128,124,1);
+  -moz-box-shadow: 0px 0px 200px 10px rgba(124,128,124,1);
+  box-shadow: 0px 0px 200px 10px rgba(124,128,124,1);
+}
