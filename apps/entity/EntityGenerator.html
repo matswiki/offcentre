@@ -19,10 +19,9 @@
   <div class="dropdownMenubar" id="dropdownMenubar">
     <div class="dropdown bgBlue tabLeft">
       <div class="dropdownTitle">Select Table</div>
-      <div>
+      <div style="padding:10px;">
         <select id="messageDefinitionList" size="10" onchange="retrieveMessageDefinition()">
-        </select><br/>
-        <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
+        </select>
       </div>
     </div>  
     <div class="dropdown bgBlue square">
@@ -32,13 +31,14 @@
       <div class="dropdownLink" onclick="showDialog('xsdDiv')"><img src="../../images/xsd.png" class="toolbarIcon"/>&nbsp;XSD Viewer</div>
       <div class="dropdownLink" onclick="showDialog('jsonImportDiv')"><img src="../../images/json.png" class="toolbarIcon"/>&nbsp;JSON editor</div>
       <div class="dropdownLink" onclick="showDialog('sqlViewerDialog')"><img src="../../images/sql.png" class="toolbarIcon"/>&nbsp;SQL Viewer</div>
-      <div class="dropdownLink" onclick="showDialog('loggerDiv')"><img src="../../images/log.png" class="toolbarIcon"/>&nbsp;title</div>
+      <div class="dropdownLink" onclick="showDialog('loggerDiv')"><img src="../../images/log.png" class="toolbarIcon"/>&nbsp;Log</div>
     </div>  
-    <div class="dropdown bgBlue tabRight" style="height:70px; width:500px;">
+    <div class="dropdown bgBlue tabRight" style="height:70px; width:600px;">
       <div class="dropdownTitle">
         Table name : <input type="text" id="recordName" value=""/>&nbsp;
         <input type="button" class="glass btn green" onclick="showDialog('newFieldDialog')" value="Add Field"/>&nbsp;
-        <input type="button" class="glass btn blue" value="Save table" onclick="saveMessageDefinition()"  title="Save current table definition"/>
+        <input type="button" class="glass btn blue" value="Save table" onclick="saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
+        <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
       </div>
     </div>
   </div>
@@ -90,16 +90,18 @@
   </div>
   
   <div class="dialog" id="loggerDiv">
-    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:70%; top:70px; left:100px;">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:70px; left:50px;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/log.png" class="dialogIcon"/>
         <div class="dialogTitle">Log</div>
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('loggerDiv')"/></div>
       </div>
       <div class="dialogBody" style="padding:10px;">
-        <table id="loggerTable" style="width:100%; height:300px;"></table>
+        <div style="height:400px; overflow:auto">
+          <table id="loggerTable" style="width:100%; height:100%;"></table>
+        </div>
       </div>
-      <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
         <input type="button" class="btn" onclick="clearLog()" value="Clear"/>
       </div>
     </div>
@@ -112,7 +114,7 @@
         <div class="dialogTitle">Java</div>
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('codeDiv')"/></div>
       </div>
-      <div class="dialogBody" style="padding:10px; height:300px;">
+      <div class="dialogBody" style="padding:10px; height:400px;">
         <pre id="generatedCode" style="height:100%;"></pre>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
@@ -125,14 +127,14 @@
   </div>
   
   <div class="dialog" id="codeMergeDiv">
-    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:80%; top:50px; left:100px;">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:50px; left:100px;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/java.png" class="dialogIcon"/>
         <div class="dialogTitle">Code Merge</div>
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('codeMergeDiv')"/></div>
       </div>
-      <div class="dialogBody" style="padding:10px; height:300px;">
-        <table style="width:100%;height:100%">
+      <div class="dialogBody" style="padding:10px;">
+        <table style="width:100%;height:400px">
           <thead>
           <tr> 
             <td style="width:30%">List<br/>
@@ -162,7 +164,9 @@
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('jsonImportDiv')"/></div>
       </div>
       <div class="dialogBody" style="padding:10px;">
-        <textarea id="jsonImporter" style=" height:300px;"></textarea>
+        <div style=" height:300px;">
+          <textarea id="jsonImporter" style=" height:100%;"></textarea>
+        </div>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
         <input type="button" class="glass btn green" value="Import" onclick="importJSON()"/>
