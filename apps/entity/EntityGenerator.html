@@ -9,132 +9,130 @@
 <script src="../../lib/main.js"></script>
 <link type="text/css" rel="stylesheet" href="../../extlib/bootstrap/bootstrap.max.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/style.css"/>
+<link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
+<script src="../../lib/dialog/dialog.js"></script>
 </head>
 <body bgcolor="#ffffff">
-  <div class="menuBar">
-    <div class="menuItem" style="text-align:center; left:500px; width:auto;">
-      <input type="button" class="glass btn blue" value="Save table as" onclick="saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
-      <input type="text" id="recordName" value=""/>
-    </div>
-    <div class="menuItem" style="text-align:center; left:5px; width:auto;">
-      Open table:&nbsp;
-      <select id="messageDefinitionList" onchange="retrieveMessageDefinition()">
-      </select>&nbsp;&nbsp;&nbsp;
-      <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
-    </div>
-  </div>
- 
-  <div class="toolbar">
-    <img src="../../images/sqlImport.png"   class="toolbarIcon" onclick="showDialog('tcImportDialog')" title="Import table from SQL script"/>&nbsp;
-    <img src="../../images/java.png"  class="toolbarIcon" onclick="showDialog('codeDiv')" title="Java"/>&nbsp;
-    <img src="../../images/xsd.png"   class="toolbarIcon" onclick="showDialog('xsdDiv')" title="XSD Viewer"/>&nbsp;
-    <img src="../../images/json.png"  class="toolbarIcon" onclick="showDialog('jsonImportDiv')" title="JSON editor"/>&nbsp;
-    <img src="../../images/sql.png"   class="toolbarIcon" onclick="showDialog('sqlViewerDialog')" title="SQL Viewer"/>&nbsp;
-    <img src="../../images/log.png"   class="toolbarIcon" onclick="showDialog('loggerDiv')" title="Log"/>&nbsp;
-  </div>
- 
-  <div id="messageDefinition" class="contentPane whiteBar" style="display:block;">
-    <div class="dialogHeader whiteBar">
-      <div class="dialogHeaderTitle" onclick="openItemList(0)">Table definition</div>
-      <div class="dialogHeaderCloser">
-        <input type="button" class="glass btn green" onclick="showDialog('newFieldDialog')" value="Add Field"/>
+  
+  <div class="dropdownMenubar" id="dropdownMenubar">
+    <div class="dropdown bgBlue tabLeft">
+      <div class="dropdownTitle">Select Table</div>
+      <div>
+        <select id="messageDefinitionList" size="10" onchange="retrieveMessageDefinition()">
+        </select><br/>
+        <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
+      </div>
+    </div>  
+    <div class="dropdown bgBlue square">
+      <div class="dropdownTitle">Options</div>
+      <div class="dropdownLink" onclick="showDialog('tcImportDialog')"><img src="../../images/sqlImport.png" class="toolbarIcon"/>&nbsp;Import table from SQL script</div>
+      <div class="dropdownLink" onclick="showDialog('codeDiv')"><img src="../../images/java.png" class="toolbarIcon"/>&nbsp;Java</div>
+      <div class="dropdownLink" onclick="showDialog('xsdDiv')"><img src="../../images/xsd.png" class="toolbarIcon"/>&nbsp;XSD Viewer</div>
+      <div class="dropdownLink" onclick="showDialog('jsonImportDiv')"><img src="../../images/json.png" class="toolbarIcon"/>&nbsp;JSON editor</div>
+      <div class="dropdownLink" onclick="showDialog('sqlViewerDialog')"><img src="../../images/sql.png" class="toolbarIcon"/>&nbsp;SQL Viewer</div>
+      <div class="dropdownLink" onclick="showDialog('loggerDiv')"><img src="../../images/log.png" class="toolbarIcon"/>&nbsp;title</div>
+    </div>  
+    <div class="dropdown bgBlue tabRight" style="height:70px; width:500px;">
+      <div class="dropdownTitle">
+        Table name : <input type="text" id="recordName" value=""/>&nbsp;
+        <input type="button" class="glass btn green" onclick="showDialog('newFieldDialog')" value="Add Field"/>&nbsp;
+        <input type="button" class="glass btn blue" value="Save table" onclick="saveMessageDefinition()"  title="Save current table definition"/>
       </div>
     </div>
-    <div class="dialogContent whiteBar">
-      <section class="fixedHeaderTable blueGradient" style="height:100%; width:100%;">
-        <div class="container shadow">
-          <table id="messageDefinitionTable">
-            <thead>
-              <tr>
-                <th><div>Field name</div></th>
-                <th><div>Type</div></th>
-                <th><div>Java type</div></th>
-                <th><div>Size</div></th>
-                <th><div>Nullable</div></th>
-                <th><div>&nbsp;</div></th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+  </div>
+  
+  <div class="mainPane" id="contentPane">
+    <div class="dialog" style="display:block;">
+      <div class="dialogContainer bgWhite" style="top:0px; left:0px; bottom:0px; right:0px;">
+        <div class="dialogHeader">
         </div>
-      </section>       
+        <div class="dialogBody bgBlue" style="height:450px;">
+          <section class="fixedHeaderTable" style="height:100%; width:100%;">
+            <div class="container">
+              <table id="messageDefinitionTable" style="background-color:#fafafa;">
+                <thead>
+                  <tr>
+                    <th><div>Field name</div></th>
+                    <th><div>Type</div></th>
+                    <th><div>Java type</div></th>
+                    <th><div>Size</div></th>
+                    <th><div>Nullable</div></th>
+                    <th><div>&nbsp;</div></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </section>       
+        </div>
+      </div>
     </div>
   </div>
  
-  <div id="xsdDiv" class="dialogDivOverlay">
-    <div id="xsdDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  <div class="dialog" id="xsdDiv">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/xsd.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">XSD Viewer</span>
-        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="minifyXsdTypes()">Minify</div>
-          <div class="menuLink" onclick="generateXsdTypes(false)">Format</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('xsdDiv')"/>
-        </div>
+        <div class="dialogTitle">XSD Viewer</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('xsdDiv')"/></div>
       </div>
-      <div class="dialogContent">
-        <pre id="xsdTypes"></pre>
+      <div class="dialogBody" style="padding:10px;">
+        <pre id="xsdTypes" style="height:300px;"></pre>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="minifyXsdTypes()" value="Minify"/>
+        <input type="button" class="btn" onclick="generateXsdTypes(false)" value="Format"/>
       </div>
     </div>
-  </div> 
- 
-  <div id="loggerDiv" class="dialogDivOverlay">
-    <div id="loggerDivDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  </div>
+  
+  <div class="dialog" id="loggerDiv">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:70%; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/log.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">Log</span>
-        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="clearLog()">Clear</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('loggerDiv')"/>
-        </div>
+        <div class="dialogTitle">Log</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('loggerDiv')"/></div>
       </div>
-      <div class="dialogContent">
-        <table id="loggerTable" style="width:100%"></table>
+      <div class="dialogBody" style="padding:10px;">
+        <table id="loggerTable" style="width:100%; height:300px;"></table>
+      </div>
+      <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="clearLog()" value="Clear"/>
       </div>
     </div>
-  </div>  
- 
- 
-  <div id="codeDiv" class="dialogDivOverlay">
-    <div id="codeDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  </div>
+  
+  <div class="dialog" id="codeDiv">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:70px; left:50px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/java.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">Java</span>
-        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="generateJavaAdaptor()">Adaptor</div>
-          <div class="menuLink" onclick="generateJavaAdaptorToXsd()">Adaptor to XSD</div>
-          <div class="menuLink" onclick="generateJavaXsdToAdaptor()">XSD to Adaptor</div>
-          <div class="menuLink" onclick="showCodeMerge()">Code Merge</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('codeDiv')"/>
-        </div>
+        <div class="dialogTitle">Java</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('codeDiv')"/></div>
       </div>
-      <div class="dialogContent">
-        <pre id="generatedCode"></pre>
+      <div class="dialogBody" style="padding:10px; height:300px;">
+        <pre id="generatedCode" style="height:100%;"></pre>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="generateJavaAdaptor()" value="Adaptor"/>
+        <input type="button" class="btn" onclick="generateJavaAdaptorToXsd()" value="Adaptor to XSD"/>
+        <input type="button" class="btn" onclick="generateJavaXsdToAdaptor()" value="XSD to Adaptor"/>
+        <input type="button" class="btn" onclick="showCodeMerge()" value="Code Merge"/>
       </div>
     </div>
-  </div> 
-
-  <div id="codeMergeDiv" class="dialogDivOverlay">
-    <div id="codeMergeDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  </div>
+  
+  <div class="dialog" id="codeMergeDiv">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:80%; top:50px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/java.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">Code Merge</span>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('codeMergeDiv')"/>
-        </div>
+        <div class="dialogTitle">Code Merge</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('codeMergeDiv')"/></div>
       </div>
-      <div class="dialogContent">
-        <table style="width:100%;">
+      <div class="dialogBody" style="padding:10px; height:300px;">
+        <table style="width:100%;height:100%">
           <thead>
           <tr> 
             <td style="width:30%">List<br/>
@@ -150,44 +148,39 @@
           </thead>
         </table>
       </div>
-      <div class="dialogFooter center">
-        <input type="button" class="glass btn green" value="Merge" onclick="mergeCode()"/>&nbsp;
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="glass btn green" value="Merge" onclick="mergeCode()"/>
       </div>
     </div>
-  </div> 
-  
-   <div id="jsonImportDiv" class="dialogDivOverlay">
-    <div id="jsonImportDivDialogDiv" class="dialogDiv" style="width:80%; height:80%; top:50px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  </div>
+
+  <div class="dialog" id="jsonImportDiv">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:50px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/json.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">JSON editor</span>
-        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="importJSON()">Import</div>
-          <div class="menuLink" onclick="minifyJSONRecordCode()">Minify</div>
-          <div class="menuLink" onclick="generateJSONRecordCode()">Format</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('jsonImportDiv')"/>
-        </div>
+        <div class="dialogTitle">JSON Editor</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('jsonImportDiv')"/></div>
       </div>
-      <div class="dialogContent">
-        <textarea id="jsonImporter"></textarea>
+      <div class="dialogBody" style="padding:10px;">
+        <textarea id="jsonImporter" style=" height:300px;"></textarea>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="glass btn green" value="Import" onclick="importJSON()"/>
+        <input type="button" class="glass btn green" value="Minify" onclick="minifyJSONRecordCode()"/>
+        <input type="button" class="glass btn green" value="Format" onclick="generateJSONRecordCode()"/>
       </div>
     </div>
-  </div> 
- 
- <div id="newFieldDialog" class="dialogDivOverlay">
-   <div class="dialogDiv" id="newFieldDiv" style="width:400px; height:400px; top:100px; left:200px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  </div>
+  
+ <div id="newFieldDialog" class="dialog">
+   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/table.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Add new Field</div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('newFieldDialog')"/>
-        </div>
+        <div class="dialogTitle">Add new Field</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('newFieldDialog')"/></div>
       </div>
-      <div class="dialogContent">
-        <table style="width:100%">
+      <div class="dialogBody" style="padding:10px;">
+        <table style="width:100%;">
         <thead>
           <tr>
             <td>name</td>
@@ -242,22 +235,20 @@
         </thead>
         </table>
       </div>
-      <div class="dialogFooter center">
-        <input type="button" class="glass btn green" value="Save" onclick="addRow()"/>&nbsp;
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="glass btn green" value="Save" onclick="addRow()"/>
       </div>
    </div>
  </div>
  
- <div id="fieldEditorDialog" class="dialogDivOverlay">
-   <div class="dialogDiv" id="fieldEditorDiv" style="width:400px; height:350px; top:100px; left:200px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+ <div id="fieldEditorDialog" class="dialog">
+   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/table.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Field Editor</div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('fieldEditorDialog')"/>
-        </div>
+        <div class="dialogTitle">Field Editor</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('fieldEditorDialog')"/></div>
       </div>
-      <div class="dialogContent">
+      <div class="dialogBody" style="padding:10px;">
         <table style="width:100%">
         <thead>
         <tr>
@@ -310,38 +301,36 @@
         </thead>
         </table>
       </div>
-      <div class="dialogFooter center">
-        <input type="button" class="glass btn green" value="Save" onclick="saveFieldEditor()"/>&nbsp;
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="glass btn green" value="Save" onclick="saveFieldEditor()"/>
       </div>
    </div>
   </div>
  
-  <div id="tcImportDialog" class="dialogDivOverlay">
-    <div id="importSQLDiv" class="dialogDiv" style="width:80%; height:80%; top:60px; left:20px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img class="dialogIcon" src="images/sqlImport.png"/>
-        <span class="dialogHeaderTitle">SQL Table Importer</span>
-        <div class="dropDownMenuItem" style="right:100px; z-index:30;">
-          <div>Options</div><br/>
-          <div class="menuLink" class="btn blue" onclick="importTCText()"/>Import</div>
-          <div class="menuLink" class="btn blue"onclick="formatImportTCText()">Format</div>
-          <div class="menuLink" class="btn blue" onclick="clearImportTCText()">Clear</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('tcImportDialog')"/>
-        </div>
+  <div class="dialog" id="tcImportDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:50px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/sqlImport.png" class="dialogIcon"/>
+        <div class="dialogTitle">SQL Table Importer</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('tcImportDialog')"/></div>
       </div>
-      <div class="dialogContent">
-        <textarea id="tcImportText" placeholder="example: create table test() (col1 varchar not null)"></textarea>
+      <div class="dialogBody" style="padding:10px;">
+        <textarea id="tcImportText" style="height:400px;" placeholder="example: create table test() (col1 varchar not null)"></textarea>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="glass btn green" value="Import" onclick="importTCText()"/>
+        <input type="button" class="glass btn green" value="Format" onclick="formatImportTCText()"/>
+        <input type="button" class="glass btn green" value="Clear"  onclick="clearImportTCText()"/>
       </div>
     </div>
   </div>
 
-  <div id="sqlViewerDialog" class="dialogDivOverlay">
-    <div id="sqlViewerDialogDiv" class="dialogDiv" style="width:90%; height:90%; top:20px; left:10px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img class="dialogIcon" src="../../images/sql.png"/>
-        <span class="dialogHeaderTitle">SQL Viewer</span>
+  <div class="dialog" id="sqlViewerDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:80%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/sql.png" class="dialogIcon"/>
+        <div class="dialogTitle">SQL Viewer</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('sqlViewerDialog')"/></div>
         <div class="dropDownMenuItem" style="right:100px; z-index:30; width:200px;">
           <div>SQL Scripts</div><br/>
           <div style="text-align:left;">
@@ -382,24 +371,21 @@
              </ul>
            </div>
         </div>        
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('sqlViewerDialog')"/>
-        </div>
       </div>
-      <div class="dialogContent">
-        <pre id="sqlViewerText"></pre>
+      <div class="dialogBody" style="padding:10px;">
+        <pre id="sqlViewerText" style="height:400px;"></pre>
       </div>
     </div>
   </div>
   
-  <div id="infoDialog" class="dialogDivOverlay">
-    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:100px; left:200px;">
-      <div class="dialogHeader greenBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  <div id="infoDialog" class="dialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:40%; height:150px; top:100px; left:200px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/thumbsup.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle"></div>
-        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('infoDialog')"/></div>
+        <div class="dialogTitle">Information</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('infoDialog')"/></div>
       </div>
-      <div class="dialogContent center">
+      <div class="dialogBody center" style="padding:10px;">
         <br/>
         Your request has been completed successfully.
         <br/>
@@ -407,21 +393,20 @@
     </div>
   </div> 
 
-  <div id="areYouSureDialog" class="dialogDivOverlay">
-    <div id="areYouSureDialogDiv" class="dialogDiv" style="width:40%; height:200px; top:100px; left:500px;">
-      <div class="dialogHeader redBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
+  <div id="areYouSureDialog" class="dialog">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:100px; left:200px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/question.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Warning</div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('areYouSureDialog')"/>
-        </div>
+        <div class="dialogTitle">Warning</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('areYouSureDialog')"/></div>      
       </div>
-      <div class="dialogContent center">
+      <div class="dialogBody center" style="padding:10px;">
         <br/>
         <span id="areYouSureMessage">Do you want to delete selected record?</span>
-        <br/><br/>
-        <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>&nbsp;
         <br/>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>
       </div>
     </div>
   </div> 

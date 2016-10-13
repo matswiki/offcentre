@@ -7,6 +7,7 @@
 
 <link type="text/css" rel="stylesheet" href="../../css/style.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/themes/themes.css"/>
 
 <link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
 <script src="../../lib/dialog/dialog.js"></script>
@@ -15,8 +16,8 @@
 <script src="circuit.js"></script>
 
 <link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
 
-<link type="text/css" rel="stylesheet" href="../../css/grid/grid.css"/>
 <link rel="stylesheet" href="../../extlib/jointjs/joint.min.css" />
 
 <script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
@@ -28,17 +29,23 @@
 <script src="../../extlib/bootstrap/bootstrap.min.js"></script>
 <style>
 .componentButton{
+  float:left;
   width:80px;
+  height:30px;
+  padding:2px 5px;
+  border-radius:2px;
   font-size:10px;
+  -webkit-box-shadow:5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 92, 82, 0.8);
+  -moz-box-shadow: 5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 92, 82, 0.8);
+  box-shadow:5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 82, 92, 0.8); 
 }
-.gridMenu{
-  width:200px; 
-  padding:10px; 
-  display: grid; 
-  //grid-template-columns: 100px 100px;  
-  grid-template-rows: 80px 10px 80px; 
-  grid-column-gap: 10px; 
-  grid-row-gap: 10px;
+.componentButton:hover{
+  background-color:#fafafa;
+}
+.componentMenu{
+  display:inline-block;
+  width:200px;
+  padding:10px;
 }
 </style>
 </head>
@@ -46,103 +53,76 @@
 <body>
 
   <div class="dropdownMenubar" id="dropdownMenubar">
-    <div class="dropdown bgBlue tabLeft shadow">
+    <div class="dropdown bgBlue tabLeft">
       <div class="dropdownTitle">File</div>
-      <div class="dropdownLink" onclick="Circuit.clearGraph()">New diagram</div>
-      <div class="dropdownLink" onclick="Circuit.openDiagramDialog()">Open diagram</div>
-      <div class="dropdownLink" onclick="Circuit.saveDiagramDialog()">Save diagram</div>
-      <div class="dropdownLink" onclick="Circuit.importDiagramDialog('jsonText','importDialog');">Import diagram from JSON</div>
+      <div class="dropdownLink" onclick="circuit.clearGraph()">New diagram</div>
+      <div class="dropdownLink" onclick="circuit.openDiagramDialog()">Open diagram</div>
+      <div class="dropdownLink" onclick="circuit.saveDiagramDialog()">Save diagram</div>
+      <div class="dropdownLink" onclick="circuit.importDiagramDialog('jsonText','importDialog');">Import diagram from JSON</div>
     </div>
-    <div class="dropdown bgBlue square shadow">
+    <div class="dropdown bgBlue square">
       <div class="dropdownTitle">Electronic</div>
-      <div class="gridMenu">
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M41,17h-2v5h-5v2h5v5h2v-5h5v-2h-5V17z M49,7h-4V3c0-1.657-1.343-3-3-3h-6 c-1.657,0-3,1.343-3,3v4H19V3c0-1.657-1.343-3-3-3h-6C8.343,0,7,1.343,7,3v4H3c-1.657,0-3,1.343-3,3v28c0,1.657,1.343,3,3,3h46 c1.657,0,3-1.343,3-3V10C52,8.343,50.657,7,49,7z M35,5c0-1.657,1.343-3,3-3h2c1.657,0,3,1.343,3,3v2h-8V5z M9,5 c0-1.657,1.343-3,3-3h2c1.657,0,3,1.343,3,3v2H9V5z M50,35.786C50,37.561,48.599,39,46.87,39H5.13C3.402,39,2,37.561,2,35.786 V12.214C2,10.439,3.402,9,5.13,9H46.87C48.599,9,50,10.439,50,12.214V35.786z M7,24h12v-2H7V24z"
-          value="Battery"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M32.463,36.24l-2.632,2.636l1.269,1.271c0.162,0.16,0.251,0.375,0.249,0.604c0,0.23-0.087,0.441-0.249,0.6 l-3.794,3.801l-8.121-8.125l3.796-3.793c0.301-0.303,0.9-0.307,1.203,0l0.88,0.879l2.635-2.638L32.463,36.24z M11.875,44.335 c-0.16,0.164-0.249,0.376-0.249,0.604c0,0.227,0.089,0.44,0.249,0.6l2.745,2.746L3.581,59.32l1.218,1.219l11.039-11.035l2.953,2.951 c0.305,0.307,0.9,0.307,1.202,0l6-5.993l-8.124-8.121L11.875,44.335z M32.663,23.544c-0.332,0.333-0.332,0.875,0.002,1.208 l0.878,0.876l-4.53,4.531l4.764,4.765l4.531-4.529l1.271,1.276c0.299,0.296,0.904,0.303,1.201-0.003l0.957-0.956l-8.12-8.122 L32.663,23.544z M34.932,21.279l8.123,8.119l3.881-3.883l-8.123-8.119L34.932,21.279z M48.812,16.283L60.419,4.679L59.201,3.46 L47.596,15.064l-2.621-2.623c-0.304-0.305-0.9-0.301-1.203,0l-3.641,3.64l8.121,8.119l3.637-3.638 c0.161-0.164,0.25-0.375,0.25-0.603c0-0.229-0.089-0.444-0.25-0.603L48.812,16.283z"
-          value="Resistor"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M43.161,24.513V13.633c0-6.154-5.009-11.161-11.163-11.161c-6.152,0-11.158,5.007-11.158,11.161v10.879h-4.562v6.081h5.525 v13.916h0.979l0.4,17.019h2.403l0.401-17.019h1.019V30.593h10.331v13.916h0.978l0.401,17.019h2.404l0.398-17.019h1.02V30.593h5.183 v-6.081H43.161z M41.166,30.593v12.542h-0.984h-0.525H38.71V30.593H41.166z M25.634,30.593v12.542h-0.986h-0.525h-0.945V30.593 H25.634z"
-          value="LED"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M10.83,21.355c0,0,4.729-9.627,4.729-13.577C15.558,3.482,12.073,0,7.777,0C3.482,0,0,3.482,0,7.779 c0,3.892,5.346,13.583,5.346,13.583L10.83,21.355z M8.818,20.57H7.931c-0.778-3.672-1.525-7.359-2.112-11.071 c0.603,0.808,1.391,1.185,2.41,0.152c0.521-0.528,0.856-1.292,1.133-2.027C9.181,11.939,8.999,16.255,8.818,20.57z M7.777,0.789 c3.854,0,6.989,3.136,6.989,6.99c0,3.259-3.522,10.877-4.434,12.79L9.431,20.57c0.213-5.055,0.426-10.11,0.637-15.167 c0.018-0.431-0.53-0.197-0.604,0.083C9.315,6.077,9.123,6.655,8.919,7.23C8.652,7.976,8.313,8.686,7.832,9.316 c-1.114,1.457-2.17-1.562-2.372-2.07c-0.138-0.35-0.624,0.145-0.589,0.391c0.6,4.34,1.475,8.649,2.38,12.935l-1.438,0.002 C4.227,17.63,0.79,10.661,0.79,7.779C0.79,3.925,3.925,0.789,7.777,0.789z M5.177,25.55c0,0.156,0.023,0.308,0.047,0.455c0,0-0.074,1.808,2.749,1.784c2.821-0.025,2.866-1.784,2.866-1.784 c0.023-0.147,0.049-0.299,0.049-0.455v-3.442H5.177V25.55z"
-          value="Light Bulb"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M16.653,2.033v3.3c3.006,1.551,5.065,4.683,5.065,8.299c0,5.161-4.184,9.344-9.343,9.344 c-5.16,0-9.346-4.183-9.346-9.344c0-3.316,1.735-6.223,4.34-7.881V2.32C3.032,4.242,0,8.581,0,13.632 c0,6.834,5.539,12.377,12.374,12.377c6.834,0,12.374-5.543,12.374-12.377C24.748,8.304,21.373,3.779,16.653,2.033z M12.136,15.229c1.359,0,2.457-0.803,2.457-1.79V1.795C14.593,0.804,13.495,0,12.136,0 C10.779,0,9.68,0.804,9.68,1.795v11.645C9.68,14.427,10.779,15.229,12.136,15.229z"
-          value="Switch"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M18.189,8.065c-1.697-1.697-3.507-2.638-4.043-2.103c-0.004,0.004-0.007,0.01-0.011,0.014 c-0.004,0.004-0.01,0.006-0.015,0.01l-1.833,1.834c0,0,0,0,0,0l-3.354,3.364c-0.021,0.026-0.359,0.5,0.385,1.741l-4.479,3.682 c-0.256,0.212-0.293,0.592-0.082,0.849c0.21,0.257,0.591,0.294,0.848,0.082l4.415-3.631c0.288,0.354,0.641,0.746,1.078,1.183 c0.57,0.569,1.067,1.002,1.5,1.329l-3.244,3.586c-0.223,0.247-0.204,0.628,0.043,0.852s0.628,0.204,0.851-0.043l3.378-3.734 c1.137,0.575,1.524,0.18,1.48,0.24l3.364-3.364c0.004-0.003,0.005-0.01,0.009-0.014l1.799-1.799 c0.026-0.026,0.043-0.058,0.054-0.091C20.768,11.461,19.837,9.713,18.189,8.065z M19.771,11.524 c-0.304,0.303-1.677-0.578-3.069-1.97c-1.391-1.391-2.272-2.765-1.97-3.068c0.304-0.304,1.677,0.578,3.068,1.97 C19.192,9.847,20.073,11.221,19.771,11.524z"
-          value="Capacitor"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M8.5,1C4.358,1,1,4.358,1,8.5C1,12.643,4.358,16,8.5,16c4.143,0,7.5-3.357,7.5-7.5C16,4.358,12.643,1,8.5,1z M8.5,15 C4.916,15,2,12.084,2,8.5S4.916,2,8.5,2S15,4.916,15,8.5S12.084,15,8.5,15z"
-          value="Parallel"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M25,8.875C16.108,8.875,8.875,16.107,8.875,25S16.108,41.125,25,41.125c8.893,0,16.125-7.232,16.125-16.125 S33.891,8.875,25,8.875z M25,37.125c-6.686,0-12.125-5.439-12.125-12.125S18.314,12.875,25,12.875 c6.686,0,12.125,5.439,12.125,12.125S31.686,37.125,25,37.125z M30.125,25c0,2.83-2.295,5.125-5.125,5.125S19.875,27.83,19.875,25 S22.17,19.875,25,19.875S30.125,22.17,30.125,25z"
-          value="Ground"/>
+      <div class="componentMenu">
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M41,17h-2v5h-5v2h5v5h2v-5h5v-2h-5V17z M49,7h-4V3c0-1.657-1.343-3-3-3h-6 c-1.657,0-3,1.343-3,3v4H19V3c0-1.657-1.343-3-3-3h-6C8.343,0,7,1.343,7,3v4H3c-1.657,0-3,1.343-3,3v28c0,1.657,1.343,3,3,3h46 c1.657,0,3-1.343,3-3V10C52,8.343,50.657,7,49,7z M35,5c0-1.657,1.343-3,3-3h2c1.657,0,3,1.343,3,3v2h-8V5z M9,5 c0-1.657,1.343-3,3-3h2c1.657,0,3,1.343,3,3v2H9V5z M50,35.786C50,37.561,48.599,39,46.87,39H5.13C3.402,39,2,37.561,2,35.786 V12.214C2,10.439,3.402,9,5.13,9H46.87C48.599,9,50,10.439,50,12.214V35.786z M7,24h12v-2H7V24z">
+          Battery
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M32.463,36.24l-2.632,2.636l1.269,1.271c0.162,0.16,0.251,0.375,0.249,0.604c0,0.23-0.087,0.441-0.249,0.6 l-3.794,3.801l-8.121-8.125l3.796-3.793c0.301-0.303,0.9-0.307,1.203,0l0.88,0.879l2.635-2.638L32.463,36.24z M11.875,44.335 c-0.16,0.164-0.249,0.376-0.249,0.604c0,0.227,0.089,0.44,0.249,0.6l2.745,2.746L3.581,59.32l1.218,1.219l11.039-11.035l2.953,2.951 c0.305,0.307,0.9,0.307,1.202,0l6-5.993l-8.124-8.121L11.875,44.335z M32.663,23.544c-0.332,0.333-0.332,0.875,0.002,1.208 l0.878,0.876l-4.53,4.531l4.764,4.765l4.531-4.529l1.271,1.276c0.299,0.296,0.904,0.303,1.201-0.003l0.957-0.956l-8.12-8.122 L32.663,23.544z M34.932,21.279l8.123,8.119l3.881-3.883l-8.123-8.119L34.932,21.279z M48.812,16.283L60.419,4.679L59.201,3.46 L47.596,15.064l-2.621-2.623c-0.304-0.305-0.9-0.301-1.203,0l-3.641,3.64l8.121,8.119l3.637-3.638 c0.161-0.164,0.25-0.375,0.25-0.603c0-0.229-0.089-0.444-0.25-0.603L48.812,16.283z">
+          Resistor
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M43.161,24.513V13.633c0-6.154-5.009-11.161-11.163-11.161c-6.152,0-11.158,5.007-11.158,11.161v10.879h-4.562v6.081h5.525 v13.916h0.979l0.4,17.019h2.403l0.401-17.019h1.019V30.593h10.331v13.916h0.978l0.401,17.019h2.404l0.398-17.019h1.02V30.593h5.183 v-6.081H43.161z M41.166,30.593v12.542h-0.984h-0.525H38.71V30.593H41.166z M25.634,30.593v12.542h-0.986h-0.525h-0.945V30.593 H25.634z">
+          LED
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M10.83,21.355c0,0,4.729-9.627,4.729-13.577C15.558,3.482,12.073,0,7.777,0C3.482,0,0,3.482,0,7.779 c0,3.892,5.346,13.583,5.346,13.583L10.83,21.355z M8.818,20.57H7.931c-0.778-3.672-1.525-7.359-2.112-11.071 c0.603,0.808,1.391,1.185,2.41,0.152c0.521-0.528,0.856-1.292,1.133-2.027C9.181,11.939,8.999,16.255,8.818,20.57z M7.777,0.789 c3.854,0,6.989,3.136,6.989,6.99c0,3.259-3.522,10.877-4.434,12.79L9.431,20.57c0.213-5.055,0.426-10.11,0.637-15.167 c0.018-0.431-0.53-0.197-0.604,0.083C9.315,6.077,9.123,6.655,8.919,7.23C8.652,7.976,8.313,8.686,7.832,9.316 c-1.114,1.457-2.17-1.562-2.372-2.07c-0.138-0.35-0.624,0.145-0.589,0.391c0.6,4.34,1.475,8.649,2.38,12.935l-1.438,0.002 C4.227,17.63,0.79,10.661,0.79,7.779C0.79,3.925,3.925,0.789,7.777,0.789z M5.177,25.55c0,0.156,0.023,0.308,0.047,0.455c0,0-0.074,1.808,2.749,1.784c2.821-0.025,2.866-1.784,2.866-1.784 c0.023-0.147,0.049-0.299,0.049-0.455v-3.442H5.177V25.55z">
+          Light Bulb
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M16.653,2.033v3.3c3.006,1.551,5.065,4.683,5.065,8.299c0,5.161-4.184,9.344-9.343,9.344 c-5.16,0-9.346-4.183-9.346-9.344c0-3.316,1.735-6.223,4.34-7.881V2.32C3.032,4.242,0,8.581,0,13.632 c0,6.834,5.539,12.377,12.374,12.377c6.834,0,12.374-5.543,12.374-12.377C24.748,8.304,21.373,3.779,16.653,2.033z M12.136,15.229c1.359,0,2.457-0.803,2.457-1.79V1.795C14.593,0.804,13.495,0,12.136,0 C10.779,0,9.68,0.804,9.68,1.795v11.645C9.68,14.427,10.779,15.229,12.136,15.229z">
+          Switch
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M18.189,8.065c-1.697-1.697-3.507-2.638-4.043-2.103c-0.004,0.004-0.007,0.01-0.011,0.014 c-0.004,0.004-0.01,0.006-0.015,0.01l-1.833,1.834c0,0,0,0,0,0l-3.354,3.364c-0.021,0.026-0.359,0.5,0.385,1.741l-4.479,3.682 c-0.256,0.212-0.293,0.592-0.082,0.849c0.21,0.257,0.591,0.294,0.848,0.082l4.415-3.631c0.288,0.354,0.641,0.746,1.078,1.183 c0.57,0.569,1.067,1.002,1.5,1.329l-3.244,3.586c-0.223,0.247-0.204,0.628,0.043,0.852s0.628,0.204,0.851-0.043l3.378-3.734 c1.137,0.575,1.524,0.18,1.48,0.24l3.364-3.364c0.004-0.003,0.005-0.01,0.009-0.014l1.799-1.799 c0.026-0.026,0.043-0.058,0.054-0.091C20.768,11.461,19.837,9.713,18.189,8.065z M19.771,11.524 c-0.304,0.303-1.677-0.578-3.069-1.97c-1.391-1.391-2.272-2.765-1.97-3.068c0.304-0.304,1.677,0.578,3.068,1.97 C19.192,9.847,20.073,11.221,19.771,11.524z">
+          Capacitor
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M8.5,1C4.358,1,1,4.358,1,8.5C1,12.643,4.358,16,8.5,16c4.143,0,7.5-3.357,7.5-7.5C16,4.358,12.643,1,8.5,1z M8.5,15 C4.916,15,2,12.084,2,8.5S4.916,2,8.5,2S15,4.916,15,8.5S12.084,15,8.5,15z">
+          Parallel
+        </div>
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M25,8.875C16.108,8.875,8.875,16.107,8.875,25S16.108,41.125,25,41.125c8.893,0,16.125-7.232,16.125-16.125 S33.891,8.875,25,8.875z M25,37.125c-6.686,0-12.125-5.439-12.125-12.125S18.314,12.875,25,12.875 c6.686,0,12.125,5.439,12.125,12.125S31.686,37.125,25,37.125z M30.125,25c0,2.83-2.295,5.125-5.125,5.125S19.875,27.83,19.875,25 S22.17,19.875,25,19.875S30.125,22.17,30.125,25z">
+          Ground
+        </div>
        </div>
      </div>
      
-     <div class="dropdown bgBlue square shadow">
+     <div class="dropdown bgBlue square">
       <div class="dropdownTitle">Other</div>
-      <div class="gridMenu">
+      <div class="componentMenu">
+        <div class="componentButton" draggable="true" ondragstart="circuit.dragShape(event)"
+          id="M61.461,12.328H11.707C5.25,12.328,0,17.405,0,23.648v23.579c0,6.233,5.25,11.312,11.707,11.312h49.754 c6.457,0,11.707-5.078,11.707-11.312V23.648C73.168,17.405,67.918,12.328,61.461,12.328z M11.707,19.872h49.754 c2.15,0,3.904,1.692,3.904,3.776v4.362H7.803v-4.362C7.803,21.564,9.556,19.872,11.707,19.872z M61.461,50.996H11.707 c-2.151,0-3.904-1.691-3.904-3.77V35.555h57.562v11.673C65.365,49.304,63.611,50.996,61.461,50.996z">
+          Class
+        </div>
         <input 
           type="button" 
           class="btn componentButton"
           draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
-          id="M61.461,12.328H11.707C5.25,12.328,0,17.405,0,23.648v23.579c0,6.233,5.25,11.312,11.707,11.312h49.754 c6.457,0,11.707-5.078,11.707-11.312V23.648C73.168,17.405,67.918,12.328,61.461,12.328z M11.707,19.872h49.754 c2.15,0,3.904,1.692,3.904,3.776v4.362H7.803v-4.362C7.803,21.564,9.556,19.872,11.707,19.872z M61.461,50.996H11.707 c-2.151,0-3.904-1.691-3.904-3.77V35.555h57.562v11.673C65.365,49.304,63.611,50.996,61.461,50.996z"
-          value="Class"/>
-        <input 
-          type="button" 
-          class="btn componentButton"
-          draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
+          ondragstart="circuit.dragShape(event)"
           id="M27.896,2.148C26.012,0.997,22.598,0.004,16.001,0C9.402,0.004,5.988,0.997,4.103,2.148 C2.207,3.283,1.975,4.726,2.002,4.999v22.74c-0.035,0.353,0.305,1.628,2.176,2.524C6.045,31.189,9.416,31.994,16,32 c6.582-0.006,9.955-0.811,11.82-1.736c1.873-0.896,2.213-2.173,2.178-2.524V4.999C30.025,4.727,29.793,3.284,27.896,2.148z M28,27.636c-0.02,0.042-0.076,0.13-0.223,0.271C27.15,28.552,24.43,30.02,16,30c-6.414,0.007-9.541-0.82-10.925-1.523 C4.381,28.126,4.088,27.828,4,27.695c-0.018-0.026,0.009-0.047,0.002-0.062L4,7.783C4.036,7.806,4.064,7.83,4.103,7.852 C5.988,9.001,9.402,9.993,16.001,10c6.597-0.006,10.011-0.999,11.896-2.147C27.934,7.83,27.963,7.805,28,7.783V27.636z"
           value="Database"/>
         <input 
           type="button" 
           class="btn componentButton"
           draggable="true" 
-          ondragstart="Circuit.dragShape(event)"
+          ondragstart="circuit.dragShape(event)"
           id="M451.716,99.715l-71.432-71.431C364.728,12.728,334,0,312,0H72C50,0,32,18,32,40v432c0,22,18,40,40,40h368c22,0,40-18,40-40 V168C480,146,467.272,115.271,451.716,99.715z M429.089,122.343c1.565,1.565,3.125,3.487,4.64,5.657H352V46.272 c2.17,1.515,4.092,3.075,5.657,4.64L429.089,122.343z M448,472c0,4.336-3.664,8-8,8H72c-4.336,0-8-3.664-8-8V40c0-4.336,3.664-8,8-8 h240c2.416,0,5.127,0.305,8,0.852V160h127.148c0.547,2.873,0.852,5.583,0.852,8V472z"
           value="File"/>
      </div>
     </div>
     
-    <div class="dropdown bgBlue square shadow">
+    <div class="dropdown bgBlue square">
       <div class="dropdownTitle">Custom</div>
       <div style="text-align:center;">
         <textarea id="customShape" style="width:300px; height:100px;">M 30 0 L 60 30 30 60 0 30 Z</textarea><br>
@@ -150,11 +130,11 @@
           type="button" 
           class="btn"
           value="Add Custom" 
-          onclick="Circuit.addCustomShape('customShape');"/>
+          onclick="circuit.addCustomShape('customShape');"/>
       </div>
     </div>
     
-    <div class="dropdown bgBlue tabRight shadow">
+    <div class="dropdown bgBlue tabRight">
       <div class="dropdownTitle">Help</div>
       <div class="dropdownLink" onclick="Dialog.showDialog('aboutDialog')">About</div>
     </div>
@@ -164,25 +144,25 @@
   <div class="mainPane" id="mainPane">
     <div class="dialog" style="display:block;">
       <div class="dialogContainer bgWhite" style="width:100%; height:100%; top:0px; left:0px;">
-        <div class="dialogBody shadow">
-          <div id="myViewer" class="grid3" ondrop="Circuit.dropShape(event)" ondragover="Circuit.allowShapeDrop(event)"></div>
+        <div class="dialogBody">
+          <div id="myViewer" class="grid3" ondrop="circuit.dropShape(event)" ondragover="circuit.allowShapeDrop(event)"></div>
         </div>
       </div>
     </div>
   </div>
   
-  <div class="dialog transparent" id="openDiagramDialog">
+  <div class="dialog" id="openDiagramDialog">
     <div class="dialogContainer bgBlue round shadow" style="width:20%; height:auto; top:70px; left:5px;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <div class="dialogTitle">Open diagram</div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('openDiagramDialog')"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('openDiagramDialog')"/></div>
       </div>
       <div class="dialogBody" style="height:200px; padding:10px;">
         <select id="diagramList" size="100" style="width:100%;height:100%">
         </select>
       </div>
       <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="Circuit.openDiagram('diagramList')" value="Open"/>
+        <input type="button" class="btn" onclick="circuit.openDiagram('diagramList')" value="Open"/>
       </div>
     </div>
   </div>
@@ -191,13 +171,13 @@
     <div class="dialogContainer bgBlue round shadow" style="width:40%; height:auto; top:70px; left:10px;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <div class="dialogTitle">Save diagram as <input type="text" id="saveDiagramAs" style="width:200px;"/></div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('saveDiagramDialog')"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('saveDiagramDialog')"/></div>
       </div>
       <div class="dialogBody" style="height:100px; padding:10px;">
         <textarea id="saveDiagramText" style="width:100%; height:100%; display:none"></textarea>
       </div>
       <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="Circuit.saveDiagramAs()" value="Save"/>
+        <input type="button" class="btn" onclick="circuit.saveDiagramAs()" value="Save"/>
       </div>
     </div>
   </div>
@@ -206,13 +186,13 @@
     <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <div class="dialogTitle">Import diagram from JSON</div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('importDialog')"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('importDialog')"/></div>
       </div>
       <div class="dialogBody" style="padding:10px;">
         <textarea id="jsonText" style="width:100%; height:300px;" placeHolder="Type (or paste) in your JSON text here."></textarea>
       </div>
       <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="Circuit.importGraphFromJson('jsonText')" value="Import"/>
+        <input type="button" class="btn" onclick="circuit.importGraphFromJson('jsonText')" value="Import"/>
       </div>
     </div>
   </div>
@@ -221,7 +201,7 @@
     <div class="dialogContainer bgRed round shadow" style="width:400px; height:200px; top:20%; left:30%;">
       <div class="dialogHeader">
         <div class="dialogTitle">Message</div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('messageDialog')"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('messageDialog')"/></div>
       </div>
       <div class="dialogBody" style="height:300px; text-align:center;">
       </div>
@@ -232,7 +212,7 @@
     <div class="dialogContainer bgBlue round shadow" style="width:40%; height:40%; top:20%; left:30%;">
       <div class="dialogHeader">
         <div class="dialogTitle">About</div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('aboutDialog')"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('aboutDialog')"/></div>
       </div>
       <div class="dialogBody" style="height:300px;">
         
@@ -242,10 +222,9 @@
   
   <div class="dialog" id="cellContextMenu">
    <div class="dialogContainer bgBlue round shadow" style="width:300px; height:400px; left:10px; top:10px;">
-      <!--div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);"-->
       <div class="dialogHeader">
         <div class="dialogTitle" id="dialogTitle"></div>
-        <div class="dialogCloser"><input type="button" value="x" onclick="Dialog.closeDialog('cellContextMenu')"/></div>
+        <div class="dialogCloser"><input type="button" class="closeButton" value="x" onclick="Dialog.closeDialog('cellContextMenu')"/></div>
       </div>
       <div class="dialogBody" style="height:auto;">
         <textarea id="cellViewModelText" style="width:100%;height:100px;"></textarea><br/>
@@ -260,7 +239,7 @@
   </div>
   
   <script>
-    var Circuit = new CircuitType("myViewer", new joint.dia.Graph);
+    var circuit = new CircuitType("myViewer", new joint.dia.Graph);
     document.body.addEventListener("contextmenu", function(evt){evt.preventDefault();});
   </script>
 </body>

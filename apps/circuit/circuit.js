@@ -191,7 +191,7 @@ CircuitType = function(viewerId, graph) {
   }
   
   this.openDiagramDialog = function (){
-    Circuit.reloadListFromStorage("diagramList");
+    circuit.reloadListFromStorage("diagramList");
     Dialog.showDialog("openDiagramDialog");
   }
   
