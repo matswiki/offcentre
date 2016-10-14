@@ -3,16 +3,17 @@
 <head>
 <title>Entity</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
-<script src="../../extlib/sqlformatter/SQLFormatter.js"></script>
-<script src="../../extlib/sorttable/sorttable.js"></script>
-<script src="../../lib/main.js"></script>
 <link type="text/css" rel="stylesheet" href="../../extlib/bootstrap/bootstrap.max.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/style.css"/>
 <link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
+
+<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
+<script src="../../extlib/sqlformatter/SQLFormatter.js"></script>
+<script src="../../extlib/sorttable/sorttable.js"></script>
 <script src="../../lib/dialog/dialog.js"></script>
+<script src="entitygenerator.js"></script>
 </head>
 <body bgcolor="#ffffff">
   
@@ -20,25 +21,25 @@
     <div class="dropdown bgBlue tabLeft">
       <div class="dropdownTitle">Select Table</div>
       <div style="padding:10px;">
-        <select id="messageDefinitionList" size="10" onchange="retrieveMessageDefinition()">
+        <select id="messageDefinitionList" size="10" onchange="entityGenerator.retrieveMessageDefinition()">
         </select>
       </div>
     </div>  
     <div class="dropdown bgBlue square">
       <div class="dropdownTitle">Options</div>
-      <div class="dropdownLink" onclick="showDialog('tcImportDialog')"><img src="../../images/sqlImport.png" class="toolbarIcon"/>&nbsp;Import table from SQL script</div>
-      <div class="dropdownLink" onclick="showDialog('codeDiv')"><img src="../../images/java.png" class="toolbarIcon"/>&nbsp;Java</div>
-      <div class="dropdownLink" onclick="showDialog('xsdDiv')"><img src="../../images/xsd.png" class="toolbarIcon"/>&nbsp;XSD Viewer</div>
-      <div class="dropdownLink" onclick="showDialog('jsonImportDiv')"><img src="../../images/json.png" class="toolbarIcon"/>&nbsp;JSON editor</div>
-      <div class="dropdownLink" onclick="showDialog('sqlViewerDialog')"><img src="../../images/sql.png" class="toolbarIcon"/>&nbsp;SQL Viewer</div>
-      <div class="dropdownLink" onclick="showDialog('loggerDiv')"><img src="../../images/log.png" class="toolbarIcon"/>&nbsp;Log</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('tcImportDialog')"><img src="../../images/sqlImport.png" class="toolbarIcon"/>&nbsp;Import table from SQL script</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('codeDiv')"><img src="../../images/java.png" class="toolbarIcon"/>&nbsp;Java</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('xsdDiv')"><img src="../../images/xsd.png" class="toolbarIcon"/>&nbsp;XSD Viewer</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('jsonImportDiv')"><img src="../../images/json.png" class="toolbarIcon"/>&nbsp;JSON editor</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('sqlViewerDialog')"><img src="../../images/sql.png" class="toolbarIcon"/>&nbsp;SQL Viewer</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('loggerDiv')"><img src="../../images/log.png" class="toolbarIcon"/>&nbsp;Log</div>
     </div>  
     <div class="dropdown bgBlue tabRight" style="height:70px; width:600px;">
       <div class="dropdownTitle">
         Table name : <input type="text" id="recordName" value=""/>&nbsp;
-        <input type="button" class="glass btn green" onclick="showDialog('newFieldDialog')" value="Add Field"/>&nbsp;
-        <input type="button" class="glass btn blue" value="Save table" onclick="saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
-        <input type="button" class="glass btn red" value="Delete" onclick="removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
+        <input type="button" class="glass btn green" onclick="Dialog.showDialog('newFieldDialog')" value="Add Field"/>&nbsp;
+        <input type="button" class="glass btn blue" value="Save table" onclick="entityGenerator.saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
+        <input type="button" class="glass btn red" value="Delete" onclick="entityGenerator.removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
       </div>
     </div>
   </div>
@@ -83,8 +84,8 @@
         <pre id="xsdTypes" style="height:300px;"></pre>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="minifyXsdTypes()" value="Minify"/>
-        <input type="button" class="btn" onclick="generateXsdTypes(false)" value="Format"/>
+        <input type="button" class="btn" onclick="entityGenerator.minifyXsdTypes()" value="Minify"/>
+        <input type="button" class="btn" onclick="entityGenerator.generateXsdTypes(false)" value="Format"/>
       </div>
     </div>
   </div>
@@ -102,7 +103,7 @@
         </div>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="clearLog()" value="Clear"/>
+        <input type="button" class="btn" onclick="entityGenerator.clearLog()" value="Clear"/>
       </div>
     </div>
   </div>
@@ -118,10 +119,10 @@
         <pre id="generatedCode" style="height:100%;"></pre>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="btn" onclick="generateJavaAdaptor()" value="Adaptor"/>
-        <input type="button" class="btn" onclick="generateJavaAdaptorToXsd()" value="Adaptor to XSD"/>
-        <input type="button" class="btn" onclick="generateJavaXsdToAdaptor()" value="XSD to Adaptor"/>
-        <input type="button" class="btn" onclick="showCodeMerge()" value="Code Merge"/>
+        <input type="button" class="btn" onclick="entityGenerator.generateJavaAdaptor()" value="Adaptor"/>
+        <input type="button" class="btn" onclick="entityGenerator.generateJavaAdaptorToXsd()" value="Adaptor to XSD"/>
+        <input type="button" class="btn" onclick="entityGenerator.generateJavaXsdToAdaptor()" value="XSD to Adaptor"/>
+        <input type="button" class="btn" onclick="entityGenerator.showCodeMerge()" value="Code Merge"/>
       </div>
     </div>
   </div>
@@ -151,7 +152,7 @@
         </table>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="glass btn green" value="Merge" onclick="mergeCode()"/>
+        <input type="button" class="glass btn green" value="Merge" onclick="entityGenerator.mergeCode()"/>
       </div>
     </div>
   </div>
@@ -169,15 +170,15 @@
         </div>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="glass btn green" value="Import" onclick="importJSON()"/>
-        <input type="button" class="glass btn green" value="Minify" onclick="minifyJSONRecordCode()"/>
-        <input type="button" class="glass btn green" value="Format" onclick="generateJSONRecordCode()"/>
+        <input type="button" class="glass btn green" value="Import" onclick="entityGenerator.importJSON()"/>
+        <input type="button" class="glass btn green" value="Minify" onclick="entityGenerator.minifyJSONRecordCode()"/>
+        <input type="button" class="glass btn green" value="Format" onclick="entityGenerator.generateJSONRecordCode()"/>
       </div>
     </div>
   </div>
   
  <div id="newFieldDialog" class="dialog">
-   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:100px;">
+   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:30%;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/table.png" class="dialogIcon"/>
         <div class="dialogTitle">Add new Field</div>
@@ -240,13 +241,13 @@
         </table>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="glass btn green" value="Save" onclick="addRow()"/>
+        <input type="button" class="glass btn green" value="Save" onclick="entityGenerator.addRow()"/>
       </div>
    </div>
  </div>
  
  <div id="fieldEditorDialog" class="dialog">
-   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:100px;">
+   <div class="dialogContainer bgBlue round shadow" style="width:400px; height:auto; top:50px; left:30%;">
       <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/table.png" class="dialogIcon"/>
         <div class="dialogTitle">Field Editor</div>
@@ -306,7 +307,7 @@
         </table>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="glass btn green" value="Save" onclick="saveFieldEditor()"/>
+        <input type="button" class="glass btn green" value="Save" onclick="entityGenerator.saveFieldEditor()"/>
       </div>
    </div>
   </div>
@@ -322,9 +323,9 @@
         <textarea id="tcImportText" style="height:400px;" placeholder="example: create table test() (col1 varchar not null)"></textarea>
       </div>
       <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
-        <input type="button" class="glass btn green" value="Import" onclick="importTCText()"/>
-        <input type="button" class="glass btn green" value="Format" onclick="formatImportTCText()"/>
-        <input type="button" class="glass btn green" value="Clear"  onclick="clearImportTCText()"/>
+        <input type="button" class="glass btn green" value="Import" onclick="entityGenerator.importTCText()"/>
+        <input type="button" class="glass btn green" value="Format" onclick="entityGenerator.formatImportTCText()"/>
+        <input type="button" class="glass btn green" value="Clear"  onclick="entityGenerator.clearImportTCText()"/>
       </div>
     </div>
   </div>
@@ -340,38 +341,38 @@
           <div style="text-align:left;">
              TABLE scripts
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateTCsql)">Create table</li>
-              <li class="menuLink" onclick="loadSQL(generateUpdateTableSql)">Update table</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateTCsql)">Create table</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateUpdateTableSql)">Update table</li>
              </ul>
              CREATE script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPCreateSql)">Create</li>
-              <li class="menuLink" onclick="loadUsage('create')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPCreateSql)">Create</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('create')">Usage</li>
              </ul>
              RETRIEVE script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPCreateSql)">Retrieve</li>
-              <li class="menuLink" onclick="loadUsage('retrieve')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPCreateSql)">Retrieve</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('retrieve')">Usage</li>
              </ul>
              SEARCH script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPSearchSql)">Search</li>
-              <li class="menuLink" onclick="loadUsage('search')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPSearchSql)">Search</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('search')">Usage</li>
              </ul>
              LIST script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPListSql)">List</li>
-              <li class="menuLink" onclick="loadUsage('list')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPListSql)">List</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('list')">Usage</li>
              </ul>
              UPDATE script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPUpdateSql)">Update</li>
-              <li class="menuLink" onclick="loadUsage('update')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPUpdateSql)">Update</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('update')">Usage</li>
              </ul>
              DELETE script
              <ul>
-              <li class="menuLink" onclick="loadSQL(generateSPDeleteSql)">Delete</li>
-              <li class="menuLink" onclick="loadUsage('delete')">Usage</li>
+              <li class="menuLink" onclick="entityGenerator.loadSQL(entityGenerator.generateSPDeleteSql)">Delete</li>
+              <li class="menuLink" onclick="entityGenerator.loadUsage('delete')">Usage</li>
              </ul>
            </div>
         </div>        
@@ -383,8 +384,8 @@
   </div>
   
   <div id="infoDialog" class="dialog">
-    <div class="dialogContainer bgBlue round shadow" style="width:40%; height:150px; top:100px; left:200px;">
-      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+    <div class="dialogContainer bgBlue round shadow" style="width:40%; height:150px; top:40%; left:30%">
+      <div class="dialogHeader">
         <img src="../../images/thumbsup.png" class="dialogIcon"/>
         <div class="dialogTitle">Information</div>
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('infoDialog')"/></div>
@@ -398,8 +399,8 @@
   </div> 
 
   <div id="areYouSureDialog" class="dialog">
-    <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:100px; left:200px;">
-      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:40%; left:30%;">
+      <div class="dialogHeader">
         <img src="../../images/question.png" class="dialogIcon"/>
         <div class="dialogTitle">Warning</div>
         <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('areYouSureDialog')"/></div>      
@@ -420,7 +421,7 @@
       <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
         <img src="../../images/table.png" class="dialogIcon"/>
         <div class="dialogHeaderTitle" id="listDialogTitle">Quick List</div>
-        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('listDialog')"/></div>
+        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="Dialog.closeDialog('listDialog')"/></div>
       </div>
       <div class="dialogContent">
         <textarea id="listDialogItems"></textarea>
@@ -430,7 +431,7 @@
   
   
   <script>
-    loadFromLocalStorage("messageDefinitionList");
+    entityGenerator.loadFromLocalStorage("messageDefinitionList");
   </script>
  </body>
 </html>

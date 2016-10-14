@@ -1,296 +1,40 @@
 <!doctype html>
 <html>
 <head>
-<title>Charting Tools</title>
+<title>Sequence Diagram Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link type="text/css" rel="stylesheet" href="../../extlib/bootstrap/bootstrap.min.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/style.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/themes/themes.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/grid/grid.css"/>
-<link rel="stylesheet" href="../../extlib/jointjs/joint.min.css" />
-
-<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
-<script src="../../lib/main.js"></script>
+<link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
+<script src="../../extlib/jquery/jquery.min.js"></script>
+<script src="../../extlib/bootstrap/bootstrap.min.js"></script>
 <script src="../../extlib/sequence/raphael-min.js"></script>
 <script src="../../extlib/sequence/underscore-min.js"></script>
 <script src="../../extlib/sequence/sequence-diagram-min.js"></script>
-<script src="../../extlib/jquery/jquery.min.js"></script>
 <script src="../../extlib/lodash/lodash.min.js"></script>
 <script src="../../extlib/backbone/backbone.min.js"></script>
-<script src="../../extlib/jointjs/joint.min.js"></script>
 
-<script src="../../extlib/bootstrap/bootstrap.min.js"></script>
+<link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
+<script src="../../lib/dialog/dialog.js"></script>
+
+<!--script src="../../lib/main.js"></script-->
+<script src="sequence.js"></script>
 </head>
-<style>
-  .graphViewer{
-    position:absolute;
-    top:5px;
-    left:5px;
-    right:5px;
-    bottom:5px;
-    border:1px solid silver;
-  }
-</style>
-
-<script>
-    var diagram;
-    var themeChoice = "simple"; //hand
-
-    var FSM = function () {
-      return {
-        showMe : 
-          function (text) { 
-            console.log(text);
-          },
-        tellMe :
-          function (text){
-            console.log(text.toUpperCase());
-          }
-         
-      }
-    }();
-
-    function changeTheme(){
-      themeChoice = document.getElementById("themeSelect").options[document.getElementById("themeSelect").selectedIndex].value;
-      FSM.tellMe(themeChoice);
-      drawSequenceDiagram();
-    }
-
-    function clearDiagram(){
-      document.getElementById("diagramViewer").innerHTML=""; 
-    }
-    
-    function drawSequenceDiagram(){
-      clearDiagram();
-      var sequenceTextValue = document.getElementById("sequenceText").value;
-      diagram = Diagram.parse(sequenceTextValue);
-      diagram.drawSVG("diagramViewer", {theme: themeChoice});
-
-    }
-
-    function  drawStateDiagram(){
-      clearDiagram();
-      var stateTextValue = document.getElementById("stateText").value;
-      diagram = Diagram.parse(stateTextValue);
-      diagram.drawSVG("diagramViewer", {theme: themeChoice});
-
-    }
-    
-    function loadTab(tabId){
-      var tab = document.getElementById(tabId);
-      var response = "<br/><h3>"+tabId+"</h3>";
-      //retrieve the rest of the data from somewhere
-      if (tabId == "Address"){
-        for (var i = 0; i  <  10; i++){
-          response += "blah blah blah <br/>";
-        }
-      }
-      tab.innerHTML = response+"<br/>";
-    }
-
-    function getSequenceFromJava(transitions){
-      var output = "";
-      if (transitions){
-        var totalLines = transitions.length;
-        for (var i = 0; i < totalLines; i++){
-          var transition = transitions[i];
-          if (transition){
-            var fromState = transition.fromState;
-            var toState = transition.toState;
-            var transition = transition.transition;
-            output += fromState +"->"+toState+":"+transition+"\n";
-          }
-        }
-      }
-      return output;
-    }
-
-    function getStateFromJava(transitions){
-      var output = "";
-      if (transitions){
-        var totalLines = transitions.length;
-        for (var i = 0; i < totalLines; i++){
-          var transition = transitions[i];
-          if (transition){
-            var fromState = transition.fromState;
-            var toState = transition.toState;
-            var transition = transition.transition;
-            output += fromState +"->"+toState+":"+transition+"\n";
-          }
-        }
-      }
-      return output;
-    }
-    
-    function drawSequenceFromJava(){
-      var transitions = parseTransitions(document.getElementById("sequenceText").value);
-      document.getElementById("sequenceText").value = getSequenceFromJava(transitions);
-    }
-    
-    function drawStateFromJava(){
-      var states = parseStates(document.getElementById("stateText").value);
-      var transitions = parseTransitions(document.getElementById("stateText").value);
-      document.getElementById("stateText").value = getStateFromJava(transitions);
-    }
-
-    function convertJavaToJson(javaText){
-      var jsonText = "";
-      var states = parseStates(javaText);
-      if (states){
-        jsonText += "{\"cells\": [";
-        var totalStates = states.length;
-        var firstTime = 0;
-        var positionX = 100;
-        var positionY = 100;
-        for (var i = 0; i < totalStates; i++){
-          state = states[i];
-          if (state && state.indexOf(" ") < 0){
-            if (firstTime > 0){
-              jsonText += ","
-            }
-            jsonText += "{\"type\": \"basic.Path\",\"size\": {\"width\": 200,\"height\": 70},\"position\": {";
-            jsonText += "\"x\":" + positionX;
-            jsonText += ",\"y\":" + positionY;
-            jsonText += "},\"angle\": 0,";
-            jsonText += "\"id\": \""+state+"\",";
-            jsonText += "\"attrs\": {\"path\": {\"fill\": \"white\",\"d\": \"M 25 0 82.5 0 82.5 25 25 25 Z\"},";
-            jsonText += "\"text\": {\"text\": \""+state+"\",\"fill\": \"blue\",\"ref-y\": 0.4}}}";            
-            firstTime++;
-            positionX+=250;
-            positionY+=90;
-          }
-        }
-      }
-      var transitions = parseTransitions(javaText);
-      if (transitions){
-        var totalLines = transitions.length;
-        for (var i = 0; i < totalLines; i++){
-          var transition = transitions[i];
-          if (transition){
-            var fromState = transition.fromState;
-            var toState = transition.toState;
-            var transition = transition.transition;
-            if (fromState.indexOf(" ") < 0){
-              jsonText += ",{\"type\": \"link\",";
-              jsonText += "\"source\": {\"id\": \""+fromState+"\"},";
-              jsonText += "\"target\": {\"id\": \""+toState+"\"},";
-             
-              jsonText +="\"labels\": [{\"position\": 0.5,\"attrs\": {\"rect\": {\"fill\": \"white\"},\"text\": {\"fill\": \"blue\",";
-              jsonText +="\"text\": \""+transition+"\"";
-              jsonText +="}}}],";
-            
-              jsonText +="\"attrs\": {\".marker-source\": {\"d\": \"M 10 0 L 0 5 L 10 10 z\"}}}";
-            }
-          }
-        }
-      }
-      jsonText += "]}";
-      return jsonText;
-    }
-
-    function prepareJavaStateText(javaStateText){
-      javaStateText = javaStateText.replace(/registerStateTransistion/ig, "");
-      javaStateText = javaStateText.replace(/\(\w+\./ig, "");
-      javaStateText = javaStateText.replace(/,\s+/ig, ".");
-      javaStateText = javaStateText.replace(/\);\n/ig, ";");
-      javaStateText = javaStateText.replace(/\)/ig, "");
-      javaStateText = javaStateText.replace(/\n/ig, "");
-      return javaStateText;
-    }
-    
-    function parseStates(javaStateText){
-      javaStateText = prepareJavaStateText(javaStateText);
-      var lines = javaStateText.split(";");
-      var output = "";
-      var states = [];
-      if (lines && lines.length > 0){
-        var totalLines = lines.length;
-        for (var i = 0; i < totalLines; i++){
-          var line = lines[i].split(".");
-          if (line && line.length == 3){
-            states.push(fromState);
-            states.push(toState);
-            var fromState = line[2].trim();
-            var toState = line[0].trim();
-            var transition = line[1].trim();
-          }
-        }
-      }
-      states = Array.from(new Set(states)); //create array of unique entries
-      return states;
-    }
-    
-    function parseTransitions(javaStateText){
-      javaStateText = prepareJavaStateText(javaStateText);
-      var lines = javaStateText.split(";");
-      var transitions = [];
-      if (lines && lines.length > 0){
-        var totalLines = lines.length;
-        for (var i = 0; i < totalLines; i++){
-          var line = lines[i].split(".");
-          if (line && line.length == 3){
-            var fromState = line[2].trim();
-            var toState = line[0].trim();
-            var transition = line[1].trim();
-            transitions.push({"fromState":fromState,"toState":toState,"transition":transition});
-          }
-        }
-      }
-      return transitions;
-    }
-    
-    function drawFSM(){
-      var states = parseStates(document.getElementById("sequenceText").value);
-      var transitions = parseTransitions(document.getElementById("sequenceText").value);
-      
-      document.getElementById("sequenceText").value = parseJavaStateEngine(document.getElementById("sequenceText").value);
-    }
-
-    
-</script>
-
-<body bgcolor="#E0E0E0">
-  <div class="menuBar theme2">
-    <div class="dropDownMenuItem"  style="left:1%;">
-        <div>Menu</div><br/>
-        <div class="menuLink" onclick="showDialog('sequenceDiagramEditorDialog')">Sequence Diagram</div>
+<body>
+  <div class="dropdownMenubar" id="dropdownMenubar">
+    <div class="dropdown bgBlue tabLeft">
+      <div class="dropdownTitle">File</div>
+      <div class="dropdownLink" onclick="sequence.clearDiagram()">New diagram</div>
+      <div class="dropdownLink" onclick="sequence.openDiagramDialog()">Open diagram</div>
+      <div class="dropdownLink" onclick="sequence.saveDiagramDialog()">Save diagram</div>
     </div>
-  </div>
-
-  <div id="mainContent" class="contentPane blueBar" style="display:block;">
-    <div class="dialogHeader">
-      <div class="dialogHeaderTitle"></div>
-      <div class="dialogHeaderCloser"></div>
-    </div>
-    <div class="codeViewer grid3">
-      <div id="diagramViewer"></div>
-    </div>
-  </div>
- 
- 
-  <div id="sequenceDiagramEditorDialog" class="dialogDivOverlay">
-    <div id="sequenceDiagramEditorDialogDiv" class="dialogDiv theme2" style="width:50%; height:60%; top:100px; left:10px">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/sequence.png" class="dialogIcon"/>
-        <span class="dialogHeaderTitle">Sequence Diagram Editor</span>
-        <div class="dropDownMenuItem" style="right:10%;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="drawSequenceDiagram()"/>Draw</div>
-          <div class="menuLink" onclick="clearDiagram()">Clear</div>
-          <div>
-            Theme</br>
-            <select id="themeSelect" size="2" style="border:1px solid #f5f5f5; padding:10px 10px; overflow:hidden; outline:none;" onchange="changeTheme()">
-               <option value="simple" selected>Simple drawing</option>
-               <option value="hand">Hand drawing</option>
-            </select>
-          </div><br/>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('sequenceDiagramEditorDialog')"/>
-        </div>
-      </div>
-      <div class="dialogContent center">
-          <textarea class="transparent" id="sequenceText" style="width:100%; height:100%;" placeholder="stateA->stateB:transition">
+    <div class="dropdown bgBlue square" style="width:400px;">
+      <div class="dropdownTitle">Edit</div>
+      <div>
+          <textarea class="transparent" id="sequenceText" style="width:100%; height:300px;" placeholder="stateA->stateB:transition">
             Title:VISA / Mastercard Payment Authorisation
             cardholder->merchant:present card for payment
             merchant->acquirer:check balance
@@ -299,46 +43,64 @@
             issuer->visa/mastercard:balance status
             visa/mastercard->acquirer:balance status
             acquirer->merchant:balance status
-            merchant->cardholder:accept/reject payment </textarea>
+            merchant->cardholder:accept/reject payment 
+          </textarea>        
+      </div>
+      <div class="center">
+          <input type="button" class="btn" onclick="sequence.drawSequenceDiagram()" value="Draw"/>
+          <input type="button" class="btn" onclick="sequence.clearDiagramText()" value="Clear"/>
+      </div>
+    </div>
+    <div class="dropdown bgBlue tabRight">
+      <div class="dropdownTitle">Theme</div>
+      <div>
+        <select id="themeSelect" size="2" style="border:1px solid #f5f5f5; padding:10px 10px; overflow:hidden; outline:none;" onchange="sequence.changeTheme()">
+          <option value="simple" selected>Simple drawing</option>
+          <option value="hand">Hand drawing</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="mainPane grid3" id="mainPane">
+    <div class="dialog" style="display:block;">
+      <div class="dialogContainer" style="width:100%; height:100%; top:0px; left:0px;">
+        <div class="dialogBody">
+          <div id="diagramViewer"></div>
+        </div>
       </div>
     </div>
   </div>
   
-  <div id="importDialog" class="dialogDivOverlay">
-    <div id="importDialogDiv" class="dialogDiv" style="width:60%; height:90%; top:5%; right:5px;">
-      <div class="dialogHeader blueBar">
-        <img src="../../images/chart.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Import Chart</div>
-        <div class="dropDownMenuItem" style="right:10%;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="importGraphFromJson()">Import JSON</div>
-          <div class="menuLink" onclick="importGraphFromJava()">Import JAVA</div>
-          <br/>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('importDialog')"/>
-        </div>
+  <div class="dialog" id="openDiagramDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:20%; height:auto; top:70px; left:5px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <div class="dialogTitle">Open diagram</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('openDiagramDialog')"/></div>
       </div>
-      <div class="dialogContent center">
-        <textarea id="jsonText"></textarea>
+      <div class="dialogBody" style="height:200px; padding:10px;">
+        <select id="diagramList" size="100" style="width:100%;height:100%">
+        </select>
+      </div>
+      <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="sequence.openDiagram('diagramList')" value="Open"/>
       </div>
     </div>
-  </div> 
+  </div>
   
-  <div id="infoDialog" class="dialogDivOverlay">
-    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:200px; left:100px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/thumbsup.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle"></div>
-        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('infoDialog')"/></div>
+  <div class="dialog" id="saveDiagramDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:40%; height:auto; top:70px; left:10px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <div class="dialogTitle">Save diagram as <input type="text" id="saveDiagramAs" style="width:200px;"/></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('saveDiagramDialog')"/></div>
       </div>
-      <div class="dialogContent center">
-        <br/>
-        Your request has been completed successfully.
-        <br/>
+      <div class="dialogBody" style="height:100px; padding:10px;">
+        <textarea id="saveDiagramText" style="width:100%; height:100%; display:none"></textarea>
+      </div>
+      <div class="dialogFooter" style="height:50px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="sequence.saveDiagramAs()" value="Save"/>
       </div>
     </div>
-  </div> 
+  </div>
 
 </body>
 </html>

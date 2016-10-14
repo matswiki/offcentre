@@ -1,0 +1,19 @@
+.componentButton{
+  float:left;
+  width:80px;
+  height:30px;
+  padding:2px 5px;
+  border-radius:2px;
+  font-size:10px;
+  -webkit-box-shadow:5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 92, 82, 0.8);
+  -moz-box-shadow: 5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 92, 82, 0.8);
+  box-shadow:5px 2px 2px rgba(0, 0, 0, 0.1),0 0 10px rgba(82, 82, 92, 0.8); 
+}
+.componentButton:hover{
+  background-color:#fafafa;
+}
+.componentMenu{
+  display:inline-block;
+  width:200px;
+  padding:10px;
+}

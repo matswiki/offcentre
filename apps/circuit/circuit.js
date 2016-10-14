@@ -1,5 +1,4 @@
 CircuitType = function(viewerId, graph) {
-  //this.graphCount = 0;
   this.prefix = "diagram:";
   this.paper = new joint.dia.Paper({
       el: document.getElementById(viewerId),
@@ -80,10 +79,6 @@ CircuitType = function(viewerId, graph) {
         
         function updateName(){
           cellView.model.attributes.attrs.text.text = cellName.value;
-          //cellView.model.attributes.size.width = cellWidth.value;
-          //cellView.model.attributes.size.height = cellHeight.value;
-          //cellView.model.attr("text/text",cellName.value);
-          //cellView.model.attr("./size/width",cellWidth.value);
           cellView.model.attr("rect/fill",{});
           
           Dialog.closeDialog("cellContextMenu");
