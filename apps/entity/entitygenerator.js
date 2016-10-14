@@ -147,6 +147,18 @@ utilities.declareVariables = function () {
   return output + "<br/>";
 }
 
+utilities.removeMessageDefinition = function (recordName) {
+  var storage = window.localStorage;
+  if (!storage) {
+    storage = localStorage;
+  }
+  if (storage) {
+    storage.removeItem(recordName);
+    entityGenerator.loadFromLocalStorage("messageDefinitionList");
+  }
+}
+
+
 
 entitygenerator.EntityGenerator = function () {
 	this.currentRow;
@@ -872,31 +884,20 @@ entitygenerator.EntityGenerator = function () {
 
 	this.removeSelectedMessageDefinition = function () {
 		var responseButton = document.getElementById("IamSureButton");
+		var responseFunction = function () {
+			utilities.removeMessageDefinition(recordName);
+			Dialog.closeDialog("areYouSureDialog");
+		};
 		if (responseButton.removeEventListener) {
 			responseButton.removeEventListener("click", responseFunction);
 		}
 		var messageDefinitionList = document.getElementById("messageDefinitionList");
 		var selectedItem = messageDefinitionList.options[messageDefinitionList.selectedIndex].value;
 		var recordName = selectedItem;
-		responseFunction = function () {
-			this.removeMessageDefinition(recordName);
-			Dialog.closeDialog("areYouSureDialog");
-		};
 		var areYouSureMessage = document.getElementById("areYouSureMessage");
 		areYouSureMessage.innerHTML = "Do you want to delete <b>" + recordName + "</b> from local storage?";
 		responseButton.addEventListener("click", responseFunction);
 		Dialog.showDialog("areYouSureDialog");
-	}
-
-	this.removeMessageDefinition = function (recordName) {
-		var storage = window.localStorage;
-		if (!storage) {
-			storage = localStorage;
-		}
-		if (storage) {
-			storage.removeItem(recordName);
-			loadFromLocalStorage("messageDefinitionList");
-		}
 	}
 
 	this.retrieveMessageDefinition = function () {
