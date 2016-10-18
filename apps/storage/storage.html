@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<title>Web Storage Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link type="text/css" rel="stylesheet" href="../../extlib/bootstrap/bootstrap.max.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/style.css"/>
+<link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
+
+<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
+<!--script src="../../extlib/sqlformatter/SQLFormatter.js"></script-->
+<!--script src="../../extlib/sorttable/sorttable.js"></script-->
+
+<script src="../../lib/dialog/dialog.js"></script>
+<script src="../../lib/za.co.offcentreit.StringUtils.js"></script>
+<script src="storage.js"></script>
+</head>
+<body bgcolor="#ffffff">
+  
+  <div class="dropdownMenubar" id="dropdownMenubar">
+    <div class="dropdown bgBlue tabLeft">
+      <div class="dropdownTitle">Select file</div>
+      <div style="padding:10px;">
+        <select id="messageDefinitionList" size="10" style="width:300px" onchange="storageManager.retrieveMessageDefinition()">
+        </select>
+      </div>
+      <div style="padding:10px; text-align:center">
+        <input type="button" class="glass btn green" value="Refresh" onclick="storageManager.loadFromLocalStorage('messageDefinitionList')" title="Reload list from storage."/>
+      </div>
+    </div>  
+    <div class="dropdown bgBlue tabRight" style="width:300px;">
+      <div class="dropdownTitle">
+        <span id="recordName"></span>
+        <br/><br/>
+        <div style="padding:10px; text-align:center;">
+          <input type="button" class="glass btn red" value="Delete" onclick="storageManager.removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mainPane" id="contentPane">
+    <div class="dialog" style="display:block;">
+      <div class="dialogContainer bgWhite" style="top:0px; left:0px; bottom:0px; right:0px;">
+        <div class="dialogHeader">
+        </div>
+        <div class="dialogBody bgBlue" style="height:450px;">
+          <textarea id="contentViewer" style="width:100%; height:100%;resize:none; padding:10px; font-size:14px;"></textarea>
+        </div>
+        <div class="dialogFooter center">
+          <input type="button" class="glass btn blue" value="Format" onclick="storageManager.formatContent()"/>&nbsp;&nbsp;
+          <input type="button" class="glass btn blue" value="Minify" onclick="storageManager.minifyContent()"/>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="areYouSureDialog" class="dialog">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:40%; left:30%;">
+      <div class="dialogHeader">
+        <img src="../../images/question.png" class="dialogIcon"/>
+        <div class="dialogTitle">Warning</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('areYouSureDialog')"/></div>      
+      </div>
+      <div class="dialogBody center" style="padding:10px;">
+        <br/>
+        <span id="areYouSureMessage">Do you want to delete selected record?</span>
+        <br/>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>
+      </div>
+    </div>
+  </div> 
+
+  <script>
+    storageManager.loadFromLocalStorage("messageDefinitionList");
+  </script>
+ </body>
+</html>

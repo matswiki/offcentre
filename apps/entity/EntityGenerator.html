@@ -21,8 +21,11 @@
     <div class="dropdown bgBlue tabLeft">
       <div class="dropdownTitle">Select Table</div>
       <div style="padding:10px;">
-        <select id="messageDefinitionList" size="10" onchange="entityGenerator.retrieveMessageDefinition()">
+        <select id="messageDefinitionList" size="10" style="width:200px" onchange="entityGenerator.retrieveMessageDefinition()">
         </select>
+      </div>
+      <div style="padding:10px; text-align:center">
+        <input type="button" class="glass btn green" value="Refresh" onclick="entityGenerator.loadFromLocalStorage('messageDefinitionList',filePrefix)" title="Reload list from storage."/>
       </div>
     </div>  
     <div class="dropdown bgBlue square">
@@ -36,10 +39,9 @@
     </div>  
     <div class="dropdown bgBlue tabRight" style="height:70px; width:600px;">
       <div class="dropdownTitle">
-        Table name : <input type="text" id="recordName" value=""/>&nbsp;
+        Table name : <input type="text" id="recordName" value="" style="width:300px;"/>&nbsp;
         <input type="button" class="glass btn green" onclick="Dialog.showDialog('newFieldDialog')" value="Add Field"/>&nbsp;
         <input type="button" class="glass btn blue" value="Save table" onclick="entityGenerator.saveMessageDefinition()"  title="Save current table definition"/>&nbsp;
-        <input type="button" class="glass btn red" value="Delete" onclick="entityGenerator.removeSelectedMessageDefinition()" title="Delete selected table definition from storage."/>
       </div>
     </div>
   </div>
@@ -398,6 +400,21 @@
     </div>
   </div> 
 
+  <div id="errorDialog" class="dialog">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:150px; top:40%; left:30%">
+      <div class="dialogHeader">
+        <img src="../../images/error.png" class="dialogIcon"/>
+        <div class="dialogTitle">Error</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('errorDialog')"/></div>
+      </div>
+      <div class="dialogBody center" style="padding:10px;">
+        <br/>
+        <span id="errorMessage"></span>
+        <br/>
+      </div>
+    </div>
+  </div> 
+  
   <div id="areYouSureDialog" class="dialog">
     <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:40%; left:30%;">
       <div class="dialogHeader">
@@ -431,7 +448,7 @@
   
   
   <script>
-    entityGenerator.loadFromLocalStorage("messageDefinitionList");
+    entityGenerator.loadFromLocalStorage("messageDefinitionList",filePrefix);
   </script>
  </body>
 </html>

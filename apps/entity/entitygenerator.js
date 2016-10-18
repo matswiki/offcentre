@@ -18,161 +18,154 @@ entitygenerator.QueryString = function () {
 	return query_string;
 };
 var queryString = new entitygenerator.QueryString();
+var filePrefix = "entity:";
 
-entitygenerator.Utilities = function (){
-  return {
-    capitalizeFirstLetter : function (string) {
-      if (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      }
-      return string;
-    },
-    
-    lowerCaseFirstLetter : function (string) {
-      return string.charAt(0).toLowerCase() + string.slice(1);
-    },
-    
-    indent : function (indentCount) {
-      var indentString = "";
-      for (var i = 0; i < indentCount; i++) {
-        indentString += "\u00a0";
-      }
-      return indentString;
-    },
-    
-    splitWord : function (word) {
-      var newWord = word.replace(/([A-Z]+)/g, ",$1").replace(/^,/, "");
-      var wordList = newWord.split(",");
-      var sentence = "";
-      if (wordList && wordList.length > 0) {
-        for (var i = 0; i < wordList.length; i++) {
-          sentence += wordList[i] + " ";
-        }
-      } else {
-        sentence = word;
-      }
-      return sentence.trim();
-    },
-    
-    getXsdBaseType : function (type) {
-      if (type) {
-        if (type == "CHAR" || type == "CHARACTER" || type == "VARCHAR" || type == "LONGVARCHAR" || type == "TEXT") {
-          return "string";
-        } else if (type == "NUMERIC" || type == "DECIMAL" || type == "BIGINT") {
-          return "decimal";
-        } else if (type == "BIT" || type == "TINYINT" || type == "SMALLINT" || type == "INTEGER" || type == "INT") {
-          return "integer";
-        } else if (type == "BIGINT") {
-          return "Long";
-        } else if (type == "REAL") {
-          return "Float";
-        } else if (type == "FLOAT" || type == "DOUBLEPRECISION") {
-          return "Double";
-        } else if (type == "BINARY" || type == "VARBINARY" || type == "LONGVARBINARY" || type == "IMAGE") {
-          return "byte[]";
-        } else if (type == "DATETIME") {
-          return "dateTime";
-        } else if (type == "DATE") {
-          return "date";
-        } else if (type == "TIME") {
-          return "java.sql.Time";
-        } else if (type == "TIMESTAMP") {
-          return "java.sql.Timestamp";
-        }
-        return type;
-      }
-    },
+entitygenerator.Utilities = function () {
+	return {
+		capitalizeFirstLetter : function (string) {
+			if (string) {
+				return string.charAt(0).toUpperCase() + string.slice(1);
+			}
+			return string;
+		},
 
-    getJavaType : function (type) {
-      if (type) {
-        if (type == "CHAR" || type == "CHARACTER" || type == "VARCHAR" || type == "LONGVARCHAR" || type == "TEXT") {
-          return "String";
-        } else if (type == "NUMERIC" || type == "DECIMAL" || type == "BIGINT") {
-          return "BigDecimal";
-        } else if (type == "BIT" || type == "TINYINT" || type == "SMALLINT" || type == "INTEGER" || type == "INT") {
-          return "Integer";
-        } else if (type == "BIGINT") {
-          return "Long";
-        } else if (type == "REAL") {
-          return "Float";
-        } else if (type == "FLOAT" || type == "DOUBLEPRECISION") {
-          return "Double";
-        } else if (type == "BINARY" || type == "VARBINARY" || type == "LONGVARBINARY" || type == "IMAGE") {
-          return "byte[]";
-        } else if (type == "DATETIME" || type == "DATE") {
-          return "java.util.Calendar";
-        } else if (type == "TIME") {
-          return "java.sql.Time";
-        } else if (type == "TIMESTAMP") {
-          return "java.sql.Timestamp";
-        }
-        return type;
-      }
-    },
-    
-  	getSqlType : function (type, size) {
-      if (type == "SMALLINT" || type == "TINYINT" || type == "BIGINT" || type == "INTEGER" || type == "DATE" || type == "DATETIME" || type == "BIT" || type == "TEXT" || type == "IMAGE") {
-        return type;
-      } else {
-        return type + "(" + size + ")";
+		lowerCaseFirstLetter : function (string) {
+			return string.charAt(0).toLowerCase() + string.slice(1);
+		},
+
+		indent : function (indentCount) {
+			var indentString = "";
+			for (var i = 0; i < indentCount; i++) {
+				indentString += "\u00a0";
+			}
+			return indentString;
+		},
+
+		splitWord : function (word) {
+			var newWord = word.replace(/([A-Z]+)/g, ",$1").replace(/^,/, "");
+			var wordList = newWord.split(",");
+			var sentence = "";
+			if (wordList && wordList.length > 0) {
+				for (var i = 0; i < wordList.length; i++) {
+					sentence += wordList[i] + " ";
+				}
+			} else {
+				sentence = word;
+			}
+			return sentence.trim();
+		},
+
+		getXsdBaseType : function (type) {
+			if (type) {
+				if (type == "CHAR" || type == "CHARACTER" || type == "VARCHAR" || type == "LONGVARCHAR" || type == "TEXT") {
+					return "string";
+				} else if (type == "NUMERIC" || type == "DECIMAL" || type == "BIGINT") {
+					return "decimal";
+				} else if (type == "BIT" || type == "TINYINT" || type == "SMALLINT" || type == "INTEGER" || type == "INT") {
+					return "integer";
+				} else if (type == "BIGINT") {
+					return "Long";
+				} else if (type == "REAL") {
+					return "Float";
+				} else if (type == "FLOAT" || type == "DOUBLEPRECISION") {
+					return "Double";
+				} else if (type == "BINARY" || type == "VARBINARY" || type == "LONGVARBINARY" || type == "IMAGE") {
+					return "byte[]";
+				} else if (type == "DATETIME") {
+					return "dateTime";
+				} else if (type == "DATE") {
+					return "date";
+				} else if (type == "TIME") {
+					return "java.sql.Time";
+				} else if (type == "TIMESTAMP") {
+					return "java.sql.Timestamp";
+				}
+				return type;
+			}
+		},
+
+		getJavaType : function (type) {
+			if (type) {
+				if (type == "CHAR" || type == "CHARACTER" || type == "VARCHAR" || type == "LONGVARCHAR" || type == "TEXT") {
+					return "String";
+				} else if (type == "NUMERIC" || type == "DECIMAL" || type == "BIGINT") {
+					return "BigDecimal";
+				} else if (type == "BIT" || type == "TINYINT" || type == "SMALLINT" || type == "INTEGER" || type == "INT") {
+					return "Integer";
+				} else if (type == "BIGINT") {
+					return "Long";
+				} else if (type == "REAL") {
+					return "Float";
+				} else if (type == "FLOAT" || type == "DOUBLEPRECISION") {
+					return "Double";
+				} else if (type == "BINARY" || type == "VARBINARY" || type == "LONGVARBINARY" || type == "IMAGE") {
+					return "byte[]";
+				} else if (type == "DATETIME" || type == "DATE") {
+					return "java.util.Calendar";
+				} else if (type == "TIME") {
+					return "java.sql.Time";
+				} else if (type == "TIMESTAMP") {
+					return "java.sql.Timestamp";
+				}
+				return type;
+			}
+		},
+
+		getSqlType : function (type, size) {
+			if (type == "SMALLINT" || type == "TINYINT" || type == "BIGINT" || type == "INTEGER" || type == "DATE" || type == "DATETIME" || type == "BIT" || type == "TEXT" || type == "IMAGE") {
+				return type;
+			} else {
+				return type + "(" + size + ")";
+			}
 		}
-	}
 
-    
-  }
+	}
 };
 
 var utilities = new entitygenerator.Utilities();
 
 utilities.getTableName = function () {
-  var tableName = utilities.capitalizeFirstLetter(document.getElementById("recordName").value);
-  if (tableName && tableName.length > 0) {
-    return tableName;
-  }
-  return "Example";
+	var tableName = utilities.capitalizeFirstLetter(document.getElementById("recordName").value);
+	if (tableName && tableName.length > 0) {
+		return tableName;
+	}
+	return "";
 }
 
 utilities.declareVariables = function () {
-  var recordName = utilities.getTableName();
-  var table = document.getElementById("messageDefinitionTable");
-  var rowCount = table.rows.length;
-  var output = utilities.indent(2) + "DECLARE <br/>";
-  for (var rowIndex = 1; rowIndex < rowCount; rowIndex++) {
-    var row = table.rows[rowIndex];
-    output += utilities.indent(4) + "@" + utilities.lowerCaseFirstLetter(row.cells[0].innerHTML) + "  " + utilities.getSqlType(row.cells[1].innerHTML, row.cells[3].innerHTML);
-    if (rowIndex < rowCount - 1) {
-      output += ",<br/>";
-    }
-  }
-  return output + "<br/>";
+	var recordName = utilities.getTableName();
+	var table = document.getElementById("messageDefinitionTable");
+	var rowCount = table.rows.length;
+	var output = utilities.indent(2) + "DECLARE <br/>";
+	for (var rowIndex = 1; rowIndex < rowCount; rowIndex++) {
+		var row = table.rows[rowIndex];
+		output += utilities.indent(4) + "@" + utilities.lowerCaseFirstLetter(row.cells[0].innerHTML) + "  " + utilities.getSqlType(row.cells[1].innerHTML, row.cells[3].innerHTML);
+		if (rowIndex < rowCount - 1) {
+			output += ",<br/>";
+		}
+	}
+	return output + "<br/>";
 }
 
 utilities.removeMessageDefinition = function (recordName) {
-  var storage = window.localStorage;
-  if (!storage) {
-    storage = localStorage;
-  }
-  if (storage) {
-    storage.removeItem(recordName);
-    entityGenerator.loadFromLocalStorage("messageDefinitionList");
-  }
+	var storage = window.localStorage;
+	if (!storage) {
+		storage = localStorage;
+	}
+	if (storage) {
+		storage.removeItem(recordName);
+		entityGenerator.loadFromLocalStorage("messageDefinitionList", filePrefix);
+	}
 }
-
-
 
 entitygenerator.EntityGenerator = function () {
 	this.currentRow;
-	this.responseFunction;
 
-  
 	this.logQueryString = function () {
 		if (queryString) {
 			this.log("query string : " + JSON.stringify(queryString));
 		}
 	}
-
-
-
 
 	this.addRow = function () {
 		var fieldName = document.getElementById("fieldName").value;
@@ -192,7 +185,7 @@ entitygenerator.EntityGenerator = function () {
 			row.insertCell(2).innerHTML = javaType;
 			row.insertCell(3).innerHTML = fieldSize;
 			row.insertCell(4).innerHTML = nullable;
-			row.insertCell(5).innerHTML = this.addRowActions(); //+ addSortActions()
+			row.insertCell(5).innerHTML = this.addRowActions();
 		}
 	}
 
@@ -206,14 +199,14 @@ entitygenerator.EntityGenerator = function () {
 	this.deleteRow = function (thisRow) {
 		var responseButton = document.getElementById("IamSureButton");
 		var areYouSureMessage = document.getElementById("areYouSureMessage");
+		var responseFunction = function () {
+			this.deleteRowFromTable(thisRow);
+			Dialog.closeDialog("areYouSureDialog");
+		};
 		if (responseButton.removeEventListener) {
 			responseButton.removeEventListener("click", responseFunction);
 		}
 		areYouSureMessage.innerHTML = "Do you want to delete the field <b>" + thisRow.parentNode.parentNode.cells[0].innerHTML + "</b>?";
-		responseFunction = function () {
-			this.deleteRowFromTable(thisRow);
-			Dialog.closeDialog("areYouSureDialog");
-		};
 		responseButton.addEventListener("click", responseFunction);
 		Dialog.showDialog("areYouSureDialog");
 	}
@@ -224,7 +217,6 @@ entitygenerator.EntityGenerator = function () {
 			p.parentNode.removeChild(p);
 		}
 	}
-
 
 	this.createCommonVariables = function () {
 		var output = "";
@@ -806,7 +798,7 @@ entitygenerator.EntityGenerator = function () {
 	}
 
 	this.jsonToMessageDefinition = function (jsonText) {
-		this.clearMessageDefinitionTable();
+		//this.clearMessageDefinitionTable();
 		var jsonVar = JSON.parse(jsonText);
 		if (jsonVar) {
 			var rowCount = jsonVar.length;
@@ -817,7 +809,7 @@ entitygenerator.EntityGenerator = function () {
 		var table = document.getElementById("messageDefinitionTable");
 	}
 
-	this.importJSON  = function () {
+	this.importJSON = function () {
 		var jsonText = document.getElementById("jsonImporter").value;
 		this.jsonToMessageDefinition(jsonText);
 		this.reloadAll();
@@ -862,9 +854,11 @@ entitygenerator.EntityGenerator = function () {
 							if (replace && replace.toUpperCase() == "TRUE") {
 								option.text = option.text.replace(filter, "");
 							}
+							option.text = option.text.split(":")[1];
 							messageDefinitionList.add(option);
 						}
 					} else {
+						option.text = option.text.split(":")[1];
 						messageDefinitionList.add(option);
 					}
 				}
@@ -876,10 +870,19 @@ entitygenerator.EntityGenerator = function () {
 	this.saveMessageDefinition = function () {
 		var storage = this.getStorage();
 		if (storage) {
-			var recordName = utilities.getTableName();
-			storage.setItem(recordName, this.messageDefinitionToJson());
-			loadFromLocalStorage("messageDefinitionList");
-		} else {}
+			if (utilities.getTableName().length > 1) {
+				var recordName = filePrefix + utilities.getTableName();
+				storage.setItem(recordName, this.messageDefinitionToJson());
+				entityGenerator.loadFromLocalStorage("messageDefinitionList", filePrefix);
+        Dialog.showDialog("infoDialog");
+			} else {
+        document.getElementById("errorMessage").innerHTML = "Cannot save data. Please specify Table Name.";
+				Dialog.showDialog("errorDialog");
+			}
+		} else {
+      document.getElementById("errorMessage").innerHTML = "Cannot save data. Failed to initialise storage.";
+			Dialog.showDialog("errorDialog");
+    }
 	}
 
 	this.removeSelectedMessageDefinition = function () {
@@ -905,14 +908,25 @@ entitygenerator.EntityGenerator = function () {
 		if (!storage) {
 			storage = localStorage;
 		}
+
+		this.clearMessageDefinitionTable();
+
 		if (storage) {
 			var messageDefinitionList = document.getElementById("messageDefinitionList");
-			var selectedItem = messageDefinitionList.options[messageDefinitionList.selectedIndex].value;
-			var recordName = utilities.capitalizeFirstLetter(selectedItem);
-			document.getElementById("recordName").value = recordName;
-			var output = storage.getItem(recordName);
-			this.jsonToMessageDefinition(output);
-			this.reloadAll();
+			try {
+				var selectedItem = messageDefinitionList.options[messageDefinitionList.selectedIndex].value.split(":")[1];
+				if (selectedItem) {
+					var recordName = utilities.capitalizeFirstLetter(selectedItem);
+					document.getElementById("recordName").value = recordName;
+					var output = storage.getItem(filePrefix + recordName);
+					this.jsonToMessageDefinition(output);
+					this.reloadAll();
+				} else {
+					document.getElementById("recordName").value = "";
+				}
+			} catch (exception) {
+				document.getElementById("recordName").value = "";
+			}
 		}
 	}
 
@@ -960,15 +974,15 @@ entitygenerator.EntityGenerator = function () {
 		this.generateJSONRecordCode();
 	}
 
-  /*
+	/*
 	this.showContentPane = function (menuOption) {
-		var contentPaneList = document.getElementsByClassName("contentPane");
-		for (var i = 0; i < contentPaneList.length; i++) {
-			contentPaneList[i].style.display = "none";
-		}
-		document.getElementById(menuOption).style.display = "block";
+	var contentPaneList = document.getElementsByClassName("contentPane");
+	for (var i = 0; i < contentPaneList.length; i++) {
+	contentPaneList[i].style.display = "none";
 	}
-  */
+	document.getElementById(menuOption).style.display = "block";
+	}
+	 */
 
 	this.editField = function (thisRow) {
 		if (thisRow) {
@@ -1088,7 +1102,7 @@ entitygenerator.EntityGenerator = function () {
 	this.importFieldName = function (fieldName) {
 		return fieldName.replace("(", "").trim();
 	}
-  
+
 	this.importFieldType = function (fieldType) {
 		var matches = fieldType.match("(\\w+)");
 		return this.toLongSqlTypeFormat(matches[0].toUpperCase());
@@ -1180,8 +1194,6 @@ entitygenerator.EntityGenerator = function () {
 		return text;
 	}
 
-
-
 	this.openItemList = function (columnNo) {
 		var table = document.getElementById("messageDefinitionTable");
 		var recordName = utilities.getTableName();
@@ -1195,7 +1207,7 @@ entitygenerator.EntityGenerator = function () {
 		Dialog.showDialog("listDialog");
 	}
 
-	this.loadUsage  = function (usageType) {
+	this.loadUsage = function (usageType) {
 		var output = "";
 		var recordName = utilities.getTableName();
 		var table = document.getElementById("messageDefinitionTable");
@@ -1253,12 +1265,11 @@ entitygenerator.EntityGenerator = function () {
 		spSQL.innerHTML = output;
 	}
 
-
 	this.focusOn = function (elementId) {
 		document.getElementById(elementId).focus();
 	}
 
-	this.loadJsonDocument  = function (docUrl, resultContainer) {
+	this.loadJsonDocument = function (docUrl, resultContainer) {
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (xhttp.readyState == 4 && xhttp.status == 200) {
