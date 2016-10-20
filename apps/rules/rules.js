@@ -125,7 +125,8 @@ function loadListFromStorage(listName, filter, replace, exclude) {
 		var firstOne = 0;
 		for (var key in storage) {
 			var option = document.createElement("option");
-			option.text = key.split(":")[1];
+			var keyArray = key.split(":");
+			option.text = keyArray[keyArray.length - 1];
 			option.value = key;
 			if (filter && filter.length > 0) {
 				if (key.indexOf(filter) == 0) {
@@ -159,12 +160,18 @@ function loadListFromStorage(listName, filter, replace, exclude) {
 	}
 }
 
-function clearAllListsAndTables() {
+function clearRuleUI(){
 	clearTable("conditionsTable");
 	clearTable("actionsTable");
-	clearSelectList("entityRulesList");
+  document.getElementById("titleRuleName").innerHTML = "";
+  document.getElementById("entityRuleName").value = "";
+
+  
+}
+function clearAllListsAndTables() {
 	clearSelectList("entityPropertyList");
-	document.getElementById("entityRuleName").value = "";
+	clearSelectList("entityRulesList");
+  clearRuleUI();
 }
 
 function loadListFromLookupTable(listId, lookupTable) {
@@ -183,7 +190,7 @@ function loadListFromLookupTable(listId, lookupTable) {
 function initialise() {
 	clearAllListsAndTables();
 	clearSelectList("entityList");
-	loadListFromStorage("entityList", filePrefix + entityFilter, "FALSE", "_");
+	loadListFromStorage("entityList", filePrefix + entityFilter, "FALSE", ":");
 	loadListFromLookupTable("operatorList", operatorLookupTable);
 	loadListFromLookupTable("actionList", actionLookupTable);
 	loadListFromLookupTable("editor_operator", operatorLookupTable);
@@ -197,7 +204,7 @@ function isEmpty(elementId) {
 function reloadEntityList() {
 	clearSelectList("entityList");
 	entityFilter = document.getElementById("entityFilterText").value;
-	loadListFromStorage("entityList", filePrefix + entityFilter, "FALSE", "_");
+	loadListFromStorage("entityList", filePrefix + entityFilter, "FALSE", ":rule:");
 }
 
 function clearTable(tableId) {
@@ -225,8 +232,14 @@ function retrieveEntity() {
 		entityName = selectedItem;
 		var output = storage.getItem(entityName);
 
-		var key = filePrefix + entityName + "_";
+		var key = entityName + ":";
 		loadListFromStorage("entityRulesList", key, "TRUE", " ");
+		var entityNameArray = selectedItem.split(":");
+		if (entityNameArray.length > 0) {
+			entityName = entityNameArray[1];
+		}
+
+    document.getElementById("titleEntityName").innerHTML = entityName;
 
 		var entityPropertyList = document.getElementById("entityPropertyList");
 
@@ -239,11 +252,11 @@ function retrieveEntity() {
 				}
 				multipleColumnSelect("entityPropertyList");
 			}
-			document.getElementById("titleEntityName").innerHTML = entityName;
 			document.getElementById("conditionEntityName").innerHTML = entityName;
 		} catch (exception) {
-			Dialog.showDialog("errorDialog", "Failed to retrieve entity (" + exception + ")");
+			Dialog.showMessageDialog("errorDialog", "Failed to retrieve entity (" + exception + ")");
 		}
+
 	}
 }
 
@@ -280,11 +293,11 @@ function addCondition() {
 			addConditionRow(property, operator, propertyValue);
 		} else {
 			focusOn("propertyValue");
-			Dialog.showDialog("errorDialog", "Please supply the property value.");
+			Dialog.showMessageDialog("errorDialog", "Please supply the property value.");
 		}
 	} catch (exception) {
 		focusOn("entityList");
-		Dialog.showDialog("errorDialog", "Please select entity.");
+		Dialog.showMessageDialog("errorDialog", "Please select entity.");
 	}
 }
 
@@ -302,7 +315,29 @@ function addAction() {
 		addActionRow(actionValue);
 	} else {
 		focusOn("entityList");
-		Dialog.showDialog("errorDialog", "Please select entity.");
+		Dialog.showMessageDialog("errorDialog", "Please select entity.");
+	}
+}
+
+function deleteRow(thisRow) {
+	var responseButton = document.getElementById("IamSureButton");
+	var areYouSureMessage = document.getElementById("areYouSureMessage");
+	responseFunction = function () {
+		deleteRowFromTable(thisRow);
+		Dialog.closeDialog("areYouSureDialog");
+	};
+	if (responseButton.removeEventListener) {
+		responseButton.removeEventListener("click", responseFunction);
+	}
+	areYouSureMessage.innerHTML = "Do you want to delete the field <b>" + thisRow.parentNode.parentNode.cells[0].innerHTML + "</b>?";
+	responseButton.addEventListener("click", responseFunction);
+	Dialog.showDialog("areYouSureDialog");
+}
+
+function deleteRowFromTable(thisRow) {
+	if (thisRow) {
+		var p = thisRow.parentNode.parentNode;
+		p.parentNode.removeChild(p);
 	}
 }
 
@@ -310,10 +345,7 @@ function getJsonRuleObject(ruleJsonText) {
 	return JSON.parse(ruleJsonText);
 }
 
-function populateRuleUI(ruleJsonText) {
-	clearTable("conditionsTable");
-	clearTable("actionsTable");
-	document.getElementById("entityRuleName").value = "";
+function populateRuleUI(ruleJsonText, ruleNameText) {
 	if (ruleJsonText && ruleJsonText.length > 0) {
 		document.getElementById("entityRuleName").value = getCurrentOption("entityRulesList").text;
 		var ruleJsonObject = getJsonRuleObject(ruleJsonText);
@@ -330,16 +362,21 @@ function populateRuleUI(ruleJsonText) {
 					addActionRow(actions[i].action);
 				}
 			}
+      document.getElementById("titleRuleName").innerHTML = ruleNameText;
+      document.getElementById("entityRuleName").value = ruleNameText;
 		}
-	}
+  }
 }
 
 function retrieveRule() {
-	var ruleName = getCurrentOption("entityRulesList").value;
+	clearTable("conditionsTable");
+	clearTable("actionsTable");
+	clearRuleUI();
+  var ruleName = getCurrentOption("entityRulesList");
 	var storage = getStorage();
-	if (storage) {
-		var output = storage.getItem(ruleName);
-		populateRuleUI(output);
+	if (storage && ruleName && ruleName.value && ruleName.value.length > 0) {
+		var output = storage.getItem(ruleName.value);
+		populateRuleUI(output, ruleName.text);
 	}
 }
 
@@ -405,29 +442,29 @@ function saveEntityRule(entityRuleNameId) {
 	if (entityName.length > 0) {
 		if (entityRuleName && entityRuleName.length > 0) {
 			var ruleJsonText = getRuleJsonText();
-			var savedRule = entityName + "_" + entityRuleName;
+			var savedRule = filePrefix + entityName + ":rule:" + entityRuleName;
 			var storage = getStorage();
 			if (storage) {
 				storage.setItem(savedRule, ruleJsonText);
 				document.getElementById(entityRuleNameId).value = "";
 				clearSelectList("entityRulesList");
-				var key = entityName + "_";
+				var key = entityName + ":rule:";
 				loadListFromStorage("entityRulesList", filePrefix + key, "TRUE", " ");
 				output = "rule " + entityRuleName + " saved successfully for entity " + entityName + ".";
-				Dialog.showDialog("infoDialog", output);
+				Dialog.showMessageDialog("infoDialog", output);
 			} else {
 				output = "I cannot store anything on your system.";
-				Dialog.showDialog("errorDialog", output);
+				Dialog.showMessageDialog("errorDialog", output);
 			}
 		} else {
 			focusOn(entityRuleNameId)
 			output = "Please supply rule name.";
-			Dialog.showDialog("errorDialog", output);
+			Dialog.showMessageDialog("errorDialog", output);
 		}
 	} else {
 		focusOn("entityList");
 		output = "Please select entity.";
-		Dialog.showDialog("errorDialog", output);
+		Dialog.showMessageDialog("errorDialog", output);
 	}
 }
 
@@ -466,7 +503,7 @@ function getEnglishText() {
 				if (i > 0) {
 					output += " and \n"
 				}
-				output += indent(2) + conditions[i].property.split(":")[0] + " " + stringUtils.htmlDecode(conditions[i].operator) + " " + conditions[i].propertyValue;
+				output += stringUtils.indent(2) + conditions[i].property.split(":")[0] + " " + stringUtils.htmlDecode(conditions[i].operator) + " " + conditions[i].propertyValue;
 			}
 		}
 		var actions = ruleJsonObject.actions;
@@ -477,7 +514,7 @@ function getEnglishText() {
 				if (i > 0) {
 					output += " and \n"
 				}
-				output += indent(2) + actions[i].action;
+				output += stringUtils.indent(2) + actions[i].action;
 			}
 		} else {
 			output += "do nothing.";
@@ -519,7 +556,7 @@ function saveCondition() {
 		currentRow.cells[1].innerHTML = document.getElementById("editor_operator").options[document.getElementById("editor_operator").selectedIndex].value;
 		currentRow.cells[2].innerHTML = document.getElementById("editor_propertyValue").value;
 	}
-	closeDialog("conditionEditorDialog");
+	Dialog.closeDialog("conditionEditorDialog");
 }
 
 function editCondition(thisRow) {
@@ -537,25 +574,25 @@ function getSqlText() {
 	var ruleJsonObject = getJsonRuleObject(ruleJsonText);
 	if (ruleJsonObject) {
 		output += "BEGIN\n";
-		output += indent(2) + "DECLARE @rulesProfileId NUMERIC(20,0)\n";
-		output += indent(2) + "DECLARE @entityRulesId NUMERIC(20,0)\n";
-		output += indent(2) + "INSERT INTO RulesProfile(rulesProfileCode, statusCode ) VALUES (";
+		output += stringUtils.indent(2) + "DECLARE @rulesProfileId NUMERIC(20,0)\n";
+		output += stringUtils.indent(2) + "DECLARE @entityRulesId NUMERIC(20,0)\n";
+		output += stringUtils.indent(2) + "INSERT INTO RulesProfile(rulesProfileCode, statusCode ) VALUES (";
 		output += "'Rules Profile 001','00')\n";
-		output += indent(2) + "SELECT @rulesProfileId = @@IDENTITY\n";
-		output += indent(2) + "INSERT INTO EntityRules (rulesProfileId, entityName,ruleName,statusCode) VALUES (";
+		output += stringUtils.indent(2) + "SELECT @rulesProfileId = @@IDENTITY\n";
+		output += stringUtils.indent(2) + "INSERT INTO EntityRules (rulesProfileId, entityName,ruleName,statusCode) VALUES (";
 		output += "@rulesProfileId,'" + entityName + "','" + ruleName + "','00')\n";
-		output += indent(2) + "SELECT @entityRulesId = @@IDENTITY\n";
+		output += stringUtils.indent(2) + "SELECT @entityRulesId = @@IDENTITY\n";
 		var actions = ruleJsonObject.actions;
 		if (actions && actions.length > 0) {
 			for (var actionIndex = 0; actionIndex < actions.length; actionIndex++) {
-				output += indent(2) + "INSERT INTO RuleActions (entityRulesId,action) VALUES (";
+				output += stringUtils.indent(2) + "INSERT INTO RuleActions (entityRulesId,action) VALUES (";
 				output += "@entityRulesId,";
 				output += "'" + actions[actionIndex].action + "')\n";
 			}
 			var conditions = ruleJsonObject.conditions;
 			if (conditions && conditions.length > 0) {
 				for (var i = 0; i < conditions.length; i++) {
-					output += indent(2) + "INSERT INTO RuleConditions (entityRulesId,property,propertyType,operator,propertyValue)";
+					output += stringUtils.indent(2) + "INSERT INTO RuleConditions (entityRulesId,property,propertyType,operator,propertyValue)";
 					output += " VALUES (";
 					output += "@entityRulesId,"
 					output += "'" + conditions[i].property.split(":")[0] + "',";
@@ -580,10 +617,10 @@ function showRuleSQL() {
 		if (ruleName.length > 0) {
 			Dialog.showDialog("sqlDialog");
 		} else {
-			Dialog.showDialog("errorDialog", "Please supply rule name.");
+			Dialog.showMessageDialog("errorDialog", "Please supply rule name.");
 		}
 	} else {
-		Dialog.showDialog("errorDialog", "Sorry, there is not enough data to generate SQL.");
+		Dialog.showMessageDialog("errorDialog", "Sorry, there is not enough data to generate SQL.");
 	}
 }
 
@@ -605,4 +642,39 @@ function getStorage() {
 		storage = localStorage;
 	}
 	return storage;
+}
+
+function focusOn(elementId) {
+	document.getElementById(elementId).focus();
+}
+
+function multipleColumnSelect(selectId) {
+	var s = document.getElementById(selectId).options,
+	l = [],
+	d = "";
+
+	for (i = 0; i < s.length; i++) {
+		column = s[i].text.split(':');
+		for (j = 0; j < column.length; j++) {
+			if (!l[j])
+				l[j] = 0;
+			if (column[j].length > l[j]) {
+				l[j] = column[j].length;
+			}
+		}
+	}
+
+	for (i = 0; i < s.length; i++) {
+		column = s[i].text.split(":");
+		temp_line = "";
+		for (j = 0; j < column.length; j++) {
+			t = (l[j] - column[j].length);
+			d = "\u00a0";
+			for (k = 0; k < t; k++) {
+				d += "\u00a0";
+			}
+			temp_line += column[j] + d;
+		}
+		s[i].text = temp_line;
+	}
 }

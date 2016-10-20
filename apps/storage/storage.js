@@ -33,9 +33,11 @@ storageman.StorageManager = function () {
 				messageDefinitionList.remove(i);
 			}
 			var option = document.createElement("option");
+      /*
 			option.text = "";
 			option.value = "";
 			messageDefinitionList.add(option);
+      */
 			for (var key in storage) {
 				var option = document.createElement("option");
 				option.text = key;

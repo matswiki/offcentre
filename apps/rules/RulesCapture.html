@@ -3,194 +3,222 @@
 <head>
 <title>Rules</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
-<script src="../../extlib/sqlformatter/SQLFormatter.js"></script>
-<script src="../../lib/dialog/dialog.js"></script>
-<script src="../../lib/za.co.offcentreit.StringUtils.js"></script>
-<script src="rules.js"></script>
 <link type="text/css" rel="stylesheet" href="../../extlib/bootstrap/bootstrap.max.css"/>
 <link type="text/css" rel="stylesheet" href="../../css/style.css"/>
+<link type="text/css" rel="stylesheet" href="../../lib/dialog/dialog.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/dropdown.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/shadows.css"/>
+<link type="text/css" rel="stylesheet" href="../../css/themes/themes.css"/>
+<script src="../../extlib/sqlformatter/SQLFormatter.js"></script>
+
+<script src="../../extlib/beautify/vkbeautify.0.99.00.beta.js"></script>
+<script src="../../extlib/sqlformatter/SQLFormatter.js"></script>
+<script src="../../extlib/sorttable/sorttable.js"></script>
+<script src="../../lib/dialog/dialog.js"></script>
+
+<script src="../../lib/za.co.offcentreit.StringUtils.js"></script>
+<script src="rules.js"></script>
 
 </script>
 </head>
 <body bgcolor="#E0E0E0" id="body">
-  <div class="menuBar">
-    <div class="menuItem" style="text-align:center; left:5px; width:350px;">
-      Filter:&nbsp;
-      <input type="text" id="entityFilterText"/>&nbsp;
-      <input type="button" class="glass btn" value="Go" onclick="reloadEntityList()"/>
-    </div>
-    <div class="menuItem" style="text-align:center; left:365px; width:auto;">
-      Entity:&nbsp;
-      <select id="entityList" onchange="retrieveEntity()" style="width:200px">
-      </select>&nbsp;&nbsp;&nbsp;
-    </div>
-    <div class="menuItem" style="text-align:center; left:655px; width:auto;">
-      Rule:&nbsp;
-      <select id="entityRulesList" onchange="retrieveRule()" style="width:200px">
-      </select>&nbsp;&nbsp;&nbsp;
-    </div>
-  </div>
- 
-  <div class="toolbar">
-    <img src="../../images/english.png"  class="toolbarIcon" onclick="showEnglishText()" title="say what?"/>&nbsp;
-    <img src="../../images/json.png"  class="toolbarIcon" onclick="showRuleJson()" title="JSON view"/>&nbsp;
-    <img src="../../images/sql.png"  class="toolbarIcon" onclick="showRuleSQL()" title="SQL view"/>&nbsp;
-  </div>
- 
-  <div id="messageDefinition" class="contentPane whiteBar" style="display:block;">
-    <div class="dialogHeader blueBar">
-      <div class="dialogHeaderTitle">Create Rule for <b id="titleEntityName"></b></div>
-      <div class="dialogHeaderCloser">
+
+   <div class="dropdownMenubar" id="dropdownMenubar">
+   
+    <div class="dropdown bgBlue tabLeft">
+      <div class="dropdownTitle">File</div>
+      <div class="dropdownLink" onclick="Dialog.showDialog('openRuleDialog')">Open rule</div>
+    </div>  
+    <div class="dropdown bgBlue square">
+      <div class="dropdownTitle">Save rule</div>
+      <div style="padding:10px;">
         <input type="button" class="glass btn" value="Save Rule as" onclick="saveEntityRule('entityRuleName')"/>&nbsp;
         <input type="text" id="entityRuleName"/>&nbsp;
       </div>
+    </div>  
+    <div class="dropdown bgBlue tabRight">
+      <div class="dropdownTitle">Options</div>
+      <div class="dropdownLink" onclick="showEnglishText()"><img src="../../images/english.png" class="toolbarIcon"/>&nbsp;Say what?</div>
+      <div class="dropdownLink" onclick="showRuleJson()"><img src="../../images/json.png" class="toolbarIcon"/>&nbsp;JSON view</div>
+      <div class="dropdownLink" onclick="showRuleSQL()"><img src="../../images/sql.png" class="toolbarIcon"/>&nbsp;SQL view</div>
     </div>
-    <div class="dialogContent whiteBar">
-      <table style="width:100%;">
-      <thead>
-        <tr>
-          <th style="width:60%;">
-            
-            <h4>&nbsp;Conditions</h4>
-            &nbsp;&nbsp;
-            When <b id="conditionEntityName"></b> matches
-            <br/>
-            &nbsp;&nbsp;
-            <select id="entityPropertyList" style="width:200px;"></select>&nbsp;
-            <select id="operatorList" style="width:200px;"></select>&nbsp;
-            <input type="text" id="propertyValue"/>&nbsp;
-            <input type="button" class="glass btn" value="Add" onclick="addCondition()"  title="Add simple condition"/>&nbsp;
-          </th>
-          <th style="width:40%">
-            <h4>&nbsp;Actions</h4>
-            &nbsp;&nbsp;
-            Do the following
-            <br/>
-            &nbsp;&nbsp;
-            <select id="actionList" style="width:200px;"></select>&nbsp;
-            <input type="button" class="glass btn" value="Add" onclick="addAction()"/>
-          </th>
-        </tr>
-      <thead>
-      <tr>
-        <td class="top">
-          <table id="conditionsTable">
-          </table>
-        </td>
-        <td class="top">
-          <table id="actionsTable">
-          </table>
-        </td>
-      </tr>
-      </table>
-    </div>
-    <br/><br/><br/>
- </div>
-   
- <div id="infoDialog" class="dialogDivOverlay">
-    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:200px; left:40%;">
-      <div class="dialogHeader greenBar">
-        <img src="../../images/thumbsup.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle"></div>
-        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('infoDialog')"/></div>
+  </div>
+  
+  <div class="dialog" id="openRuleDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:auto; height:auto; top:70px; left:5px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <div class="dialogTitle">Open rule</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('openRuleDialog')"/></div>
       </div>
-      <div class="dialogContent center" id="infoDialogContent"></div>
-    </div>
- </div> 
-
- <div id="errorDialog" class="dialogDivOverlay">
-    <div id="infoDialogDiv" class="dialogDiv" style="width:40%; height:150px; top:200px; left:40%;">
-      <div class="dialogHeader redBar">
-        <img src="../../images/error.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle"></div>
-        <div class="dialogHeaderCloser"><img src="../../images/close.png" class="closeButton" onclick="closeDialog('errorDialog')"/></div>
-      </div>
-      <div class="dialogContent center" id="errorDialogContent"></div>
-    </div>
- </div> 
- 
- <div id="areYouSureDialog" class="dialogDivOverlay">
-    <div id="areYouSureDialogDiv" class="dialogDiv" style="width:40%; height:200px; top:200px; left:40%;">
-      <div class="dialogHeader redBar">
-        <img src="../../images/question.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Warning</div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('areYouSureDialog')"/>
+      <div class="dialogBody" style="padding:10px;">
+        <div>
+          Entity filter&nbsp;
+          <input type="text" id="entityFilterText"/>&nbsp;
+          <input type="button" class="glass btn" value="Go" onclick="reloadEntityList()"/>
+        </div>
+        <div style="padding:10px; height:350px; vertical-align:top;">
+          <table style="width:100%">
+          <tr>
+            <td>Entity<br/>
+              <select id="entityList" onchange="retrieveEntity()" size="15" style="width:200px"></select>
+            </td>
+            <td>Rule<br/>
+              <select id="entityRulesList" onchange="retrieveRule()" size="15" style="width:200px"></select>
+            </td>
+          </tr>
+          </table>
         </div>
       </div>
-      <div id="areYouSureDialogContent" class="dialogContent center">
+    </div>
+  </div>
+
+
+  <div class="mainPane" id="messageDefinition" style="display:block;">
+    <div class="dialog" style="display:block;">
+      <div class="dialogContainer bgWhite" style="top:0px; left:0px; bottom:0px; right:0px;">
+        <div class="dialogHeader theme2">
+        </div>
+        <div class="dialogBody bgBlue" style="height:450px;">
+          &nbsp;&nbsp;Entity&nbsp;<b id="titleEntityName"></b>
+          &nbsp;&nbsp;Rule&nbsp;<b id="titleRuleName"></b>
+          <br/>
+          <table style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:60%;">
+                <h4>&nbsp;Conditions</h4>
+                &nbsp;&nbsp;
+                When <b id="conditionEntityName"></b> matches
+                <br/>
+                &nbsp;&nbsp;
+                <select id="entityPropertyList" style="width:200px;"></select>&nbsp;
+                <select id="operatorList" style="width:200px;"></select>&nbsp;
+                <input type="text" id="propertyValue"/>&nbsp;
+                <input type="button" class="glass btn" value="Add" onclick="addCondition()"  title="Add simple condition"/>&nbsp;
+              </th>
+              <th style="width:40%">
+                <h4>&nbsp;Actions</h4>
+                &nbsp;&nbsp;
+                Do the following
+                <br/>
+                &nbsp;&nbsp;
+                <select id="actionList" style="width:200px;"></select>&nbsp;
+                <input type="button" class="glass btn" value="Add" onclick="addAction()"/>
+              </th>
+            </tr>
+          <thead>
+          <tr>
+            <td class="top">
+              <table id="conditionsTable">
+              </table>
+            </td>
+            <td class="top">
+              <table id="actionsTable">
+              </table>
+            </td>
+          </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="infoDialog" class="dialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:40%; height:150px; top:40%; left:30%">
+      <div class="dialogHeader">
+        <img src="../../images/thumbsup.png" class="dialogIcon"/>
+        <div class="dialogTitle">Information</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('infoDialog')"/></div>
+      </div>
+      <div class="dialogBody center" id="infoDialogContent" style="padding:10px;">
+        Your request has been completed successfully.
+      </div>
+    </div>
+  </div> 
+
+
+  <div id="errorDialog" class="dialog">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:150px; top:40%; left:30%">
+      <div class="dialogHeader">
+        <img src="../../images/error.png" class="dialogIcon"/>
+        <div class="dialogTitle">Error</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('errorDialog')"/></div>
+      </div>
+      <div class="dialogBody center"  id="errorDialogContent" style="padding:10px;">
+      </div>
+    </div>
+  </div> 
+ 
+  
+  <div id="areYouSureDialog" class="dialog">
+    <div class="dialogContainer bgRed round shadow" style="width:40%; height:auto; top:40%; left:30%;">
+      <div class="dialogHeader">
+        <img src="../../images/question.png" class="dialogIcon"/>
+        <div class="dialogTitle">Warning</div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('areYouSureDialog')"/></div>      
+      </div>
+      <div class="dialogBody center" id="areYouSureDialogContent" style="padding:10px;">
         <br/>
         <span id="areYouSureMessage">Do you want to delete selected record?</span>
         <br/>
       </div>
-      <div class="dialogFooter center">
-          <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>
-      </div>
-    </div>
-  </div> 
-
-  <div id="jsonDialog" class="dialogDivOverlay">
-    <div id="jsonDialogDiv" class="dialogDiv" style="left:20px; height:600px; top:10px; width:800px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/json.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle" id="jsonDialogTitle"></div>
-        <div class="dropDownMenuItem" style="right:100px;">
-          <div>Options</div><br/>
-          <div class="menuLink" onclick="minifyJSON('jsonTextArea')">Minify</div>
-          <div class="menuLink" onclick="formatJSON('jsonTextArea')">Format</div>
-        </div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('jsonDialog')"/>
-        </div>
-      </div>
-      <div id="jsonDialogContent" class="dialogContent center">
-        <textarea id="jsonTextArea" style="width:100%; height:95%;resize:none;"></textarea>
-      </div>
-    </div>
-  </div> 
-
-  <div id="englishDialog" class="dialogDivOverlay">
-    <div id="englishDialogDiv" class="dialogDiv" style="left:20px; height:500px; top:10px; width:500px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/english.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle" id="englishDialogTitle"></div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('englishDialog')"/>
-        </div>
-      </div>
-      <div id="englishDialogContent" class="dialogContent">
-        <textarea id="englishTextArea" style="width:100%; height:95%;resize:none; padding:10px; font-size:14px;"></textarea>
-      </div>
-    </div>
-  </div> 
-
-  <div id="sqlDialog" class="dialogDivOverlay">
-    <div id="sqlDialogDiv" class="dialogDiv" style="left:50px; height:80%; top:100px; width:80%;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/sql.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle" id="sqlDialogTitle"></div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('sqlDialog')"/>
-        </div>
-      </div>
-      <div id="sqlDialogContent" class="dialogContent">
-        <textarea id="sqlTextArea" style="width:100%; height:95%;resize:none; padding:10px; font-size:14px;"></textarea>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" id="IamSureButton" class="glass btn blue" value="Yes"/>
       </div>
     </div>
   </div> 
   
-  <div id="conditionEditorDialog" class="dialogDivOverlay">
-   <div class="dialogDiv" id="fieldEditorDiv" style="width:60%; height:230px; top:100px; left:300px;">
-      <div class="dialogHeader blueBar" onmousedown="dragQueen.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="dragQueen.stopMoving(this.parentNode.parentNode);">
-        <img src="../../images/table.png" class="dialogIcon"/>
-        <div class="dialogHeaderTitle">Condition Editor</div>
-        <div class="dialogHeaderCloser">
-          <img src="../../images/close.png" class="closeButton" onclick="closeDialog('conditionEditorDialog')"/>
-        </div>
+  <div class="dialog" id="jsonDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/json.png" class="dialogIcon"/>
+        <div class="dialogTitle" id="jsonDialogTitle"></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('jsonDialog')"/></div>
       </div>
-      <div id="conditionEditorDialogContent" class="dialogContent">
-        <br/>
+      <div class="dialogBody" style="padding:10px;">
+        <textarea id="jsonTextArea" style="width:100%; height:400px;resize:none;"></textarea>
+      </div>
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
+        <input type="button" class="btn" onclick="minifyJSON('jsonTextArea')" value="Minify"/>
+        <input type="button" class="btn" onclick="formatJSON('jsonTextArea')" value="Format"/>
+      </div>
+    </div>
+  </div>
+  
+  <div class="dialog" id="englishDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/english.png" class="dialogIcon"/>
+        <div class="dialogTitle" id="englishDialogTitle"></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('englishDialog')"/></div>
+      </div>
+      <div class="dialogBody" style="padding:10px;">
+        <textarea id="englishTextArea" style="width:100%; height:400px;resize:none; padding:10px; font-size:14px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog" id="sqlDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/sql.png" class="dialogIcon"/>
+        <div class="dialogTitle" id="sqlDialogTitle"></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('sqlDialog')"/></div>
+      </div>
+      <div class="dialogBody" style="padding:10px;">
+        <textarea id="sqlTextArea" style="width:100%; height:400px;resize:none; padding:10px; font-size:14px;"></textarea>
+      </div>
+    </div>
+  </div>
+  
+  <div class="dialog" id="conditionEditorDialog">
+    <div class="dialogContainer bgBlue round shadow" style="width:60%; height:auto; top:70px; left:100px;">
+      <div class="dialogHeader" onmousedown="Dragger.startMoving(this.parentNode,this.parentNode.parentNode,event);" onmouseup="Dragger.stopMoving(this.parentNode.parentNode);">
+        <img src="../../images/table.png" class="dialogIcon"/>
+        <div class="dialogTitle" id="sqlDialogTitle"></div>
+        <div class="dialogCloser"><input type="button" value="x" class="closeButton" onclick="Dialog.closeDialog('conditionEditorDialog')"/></div>
+      </div>
+      <div class="dialogBody" style="padding:10px;">
         <table style="width:100%">
         <thead>
           <tr>
@@ -212,12 +240,12 @@
         </thead>
         </table>
       </div>
-      <div class="dialogFooter center">
+      <div class="dialogFooter" style="height:40px; padding:10px; text-align:center;">
         <input type="button" class="glass btn green" value="Save" onclick="saveCondition()"/>
-      </div>
-   </div>
+      </div>      
+    </div>
   </div>
-  
+
   <script>
     initialise();
   </script>

@@ -854,12 +854,16 @@ entitygenerator.EntityGenerator = function () {
 							if (replace && replace.toUpperCase() == "TRUE") {
 								option.text = option.text.replace(filter, "");
 							}
-							option.text = option.text.split(":")[1];
-							messageDefinitionList.add(option);
+              if (option.text.split(":").length == 2){
+                option.text = option.text.split(":")[1];
+                messageDefinitionList.add(option);
+              }
 						}
 					} else {
-						option.text = option.text.split(":")[1];
-						messageDefinitionList.add(option);
+            if (option.text.split(":").length == 2){
+              option.text = option.text.split(":")[1];
+              messageDefinitionList.add(option);
+            }
 					}
 				}
 			}
